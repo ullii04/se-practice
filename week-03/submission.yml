@@ -1,0 +1,39 @@
+schema: 1
+week: "03"
+
+student:
+  name: Elshibai Ulzhalgas
+  student_id: 24B031019
+  github: ullii04
+
+assistant:
+  tool: ChatGPT
+  model: GPT-5.6 Sol
+
+counts:
+  user_stories: 6
+  acceptance_criteria_sets: 3
+
+checker:
+  pass: 22
+  fail: 1
+  error: 0
+  commit: "7194e01"
+
+assumptions:
+  overlap_touching_bookings: allowed
+  exactly_two_hours: allowed
+
+traceability:
+  use_cases_not_covered: []
+  stories_not_traced: []
+
+review_findings:
+  - "US-02 combined all four business rules in one assumption, so I simplified the final assumption."
+  - "US-04 and US-05 both represented UC-06 Send confirmation, so I merged them into final US-04."
+  - "US-06 and US-07 both represented UC-04 Block or unblock room, so I merged them into final US-05."
+  - "US-05 acceptance criterion about administrator permissions introduced authentication-related behavior outside the scenario, so I removed it."
+
+honesty:
+  can_explain_everything_submitted: yes
+  ai_usage_disclosed: yes
