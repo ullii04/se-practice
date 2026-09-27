@@ -18,7 +18,7 @@ checker:
   pass: 22
   fail: 1
   error: 0
-  commit: "TEMP"
+  commit: "7194e01"
 
 assumptions:
   overlap_touching_bookings: allowed

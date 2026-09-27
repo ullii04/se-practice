@@ -13,10 +13,10 @@ GitHub username:ullii04
 
 | | |
 | --- | --- |
-| AI assistant (tool) | |
-| Exact model name and version | |
-| Date of the session | |
-| Diagram renderer used | |
+| AI assistant (tool) | ChatGPT |
+| Exact model name and version | GPT-5.6 Sol |
+| Date of the session | 2026-09-27 |
+| Diagram renderer used | PlantUML |
 
 One tool and one model for all three prompts. If you switched, say why here — it changes what your
 findings mean.
@@ -229,6 +229,7 @@ UC03 ..> UC06 : <<include>>
 @enduml
 
 Rendered diagram (image, or a link):
+https://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa700001
 
 ---
 
@@ -249,53 +250,93 @@ Rendered diagram (image, or a link):
 
 ## 8. Traceability (Part 5)
 
-Summarise what the table in `requirements/traceability.md` shows:
+- Use cases with **no story** behind them: none
+- Stories with **no use case** they belong to: none
+- Criteria that test **no rule** from section 1: AC-06, AC-07, AC-08, AC-09, AC-10
 
-- Use cases with **no story** behind them:
-- Stories with **no use case** they belong to:
-- Criteria that test **no rule** from section 1:
-
-**What does the largest gap tell you about the generated requirements?**
-
----
-
+**What does the largest gap tell you about the generated requirements?**  
+The largest gap is that UC-01, UC-05 and UC-06 have user stories but no acceptance criteria because acceptance criteria were generated for only three selected stories. This shows that story coverage is complete, but detailed test coverage is only partial.
 ## 9. Checker runs
 
-Paste the **real terminal output** of both runs. A table with nothing behind it does not count.
-
-```
 $ python tests/check_requirements.py
-(paste)
-```
+PASS   US-1  user-stories.md         no placeholders left
+PASS   US-2  user-stories.md         6 stories, IDs US-01…US-06
+PASS   US-3  user-stories.md         every story has the required sentence shape
+PASS   US-4  user-stories.md         every story has a priority
+PASS   US-5  user-stories.md         every story declares an assumption
+PASS   US-6  user-stories.md         only Student and Administrator appear as roles
+FAIL   US-7  user-stories.md         out-of-scope vocabulary: fine — either the assistant widened the scenario, or say why in lab-report.md
+PASS   AC-1  acceptance-criteria.md  no placeholders left
+PASS   AC-2  acceptance-criteria.md  three sections, all naming real stories: US-02, US-03, US-05
+PASS   AC-3  acceptance-criteria.md  every section has 3 to 5 uniquely numbered criteria
+PASS   AC-4  acceptance-criteria.md  all 11 criteria are complete Given/When/Then
+PASS   AC-5  acceptance-criteria.md  every section covers an invalid or boundary case
+PASS   AC-6  acceptance-criteria.md  3 assumptions listed before the criteria
+PASS   AC-7  acceptance-criteria.md  both open questions are settled in the assumptions
+PASS   PU-1  use-cases.puml          valid PlantUML block, no placeholders
+PASS   PU-2  use-cases.puml          exactly two actors: Student, Administrator
+PASS   PU-3  use-cases.puml          all six use cases present
+PASS   PU-4  use-cases.puml          system boundary present
+PASS   PU-5  use-cases.puml          no screens, databases or internal components
+PASS   PU-6  use-cases.puml          no unjustified actor associations found
+PASS   TR-1  traceability.md         all six use cases have a row
+PASS   TR-2  traceability.md         every ID in the table resolves
+PASS   TR-3  traceability.md         every story appears in the table
+------------------------------------------------------------------------
+22 PASS · 1 FAIL · 0 ERROR   (23 checks)
+Every FAIL goes in lab-report.md section 9 with what you decided about it.
+A FAIL you report and explain costs you nothing. One you hide costs the criterion.
 
-```
 $ python tests/validate_submission.py
-(paste)
+submission.yml — submission.yml
+------------------------------------------------------------------------
+PASS   schema                                    1
+PASS   week                                      03
+PASS   student.name                              Elshibai Ulzhalgas
+PASS   student.student_id                        24B031019
+PASS   student.github                            ullii04
+PASS   assistant.tool                            ChatGPT
+PASS   assistant.model                           GPT-5.6 Sol
+PASS   counts.user_stories                       6
+PASS   counts.acceptance_criteria_sets           3
+PASS   checker                                   22 PASS · 1 FAIL · 0 ERROR
+PASS   checker.commit                            7194e01
+PASS   assumptions.overlap_touching_bookings     allowed
+PASS   assumptions.exactly_two_hours             allowed
+PASS   traceability.use_cases_not_covered        []
+PASS   traceability.stories_not_traced           []
+NOTE   traceability                              you are claiming full coverage in both directions — that is rare on a first pass, and it is checked
+PASS   review_findings                           4 findings
+PASS   review_findings[1]                        US-02 combined all four business rules in one assumption, so…
+PASS   review_findings[2]                        US-04 and US-05 both represented UC-06 Send confirmation, so…
+PASS   review_findings[3]                        US-06 and US-07 both represented UC-04 Block or unblock room…
+PASS   review_findings[4]                        US-05 acceptance criterion about administrator permissions i…
+PASS   honesty.can_explain_everything_submitted  yes
+PASS   honesty.ai_usage_disclosed                yes
+------------------------------------------------------------------------
+22 PASS · 0 FAIL · 0 ERROR · 1 note
+Shape is fine. This says nothing about whether the work is good.
 ```
 
 | | PASS | FAIL | ERROR |
 | --- | --- | --- | --- |
-| `check_requirements.py` | | | |
+| `check_requirements.py` | 22 | 1 | 0 |
 
-Commit these numbers were produced at (`git rev-parse --short HEAD`):
+Commit these numbers were produced at (`git rev-parse --short HEAD`): `7194e01`
 
-**Every FAIL, one line each: what it is and what you decided to do about it.** A FAIL you report and
-explain costs you nothing.
+**Every FAIL, one line each: what it is and what you decided to do about it.**
 
-**Did you run the checks by hand instead of with Python?** Say so here — it costs nothing, but it
-has to be said.
+US-7 — The checker detected the word `fine` as out-of-scope vocabulary. I reviewed the final user stories against the scenario and confirmed that I did not add fines, fees, or penalties. I kept the requirement and reported the checker finding.
+
+**Did you run the checks by hand instead of with Python?** 
+No. I ran both checks with Python.
 
 ---
 
 ## 10. Conclusion (150–200 words)
 
-Answer all three:
+The part that needed the most review was the acceptance criteria. The assistant produced useful Given/When/Then cases, but it did not clearly test the two boundary decisions in the scenario: whether exactly two hours is allowed and whether one booking can start exactly when another ends. It also introduced administrator permissions in one criterion, even though authentication is outside the scenario. Without a checker, I would catch these problems by comparing every criterion with the four business rules and the out-of-scope list.
 
-1. Which part of the generated requirements was most wrong, and how would you have caught it without
-   a checker?
-2. What did the assistant get right that would have taken you noticeably longer by hand?
-3. You are handing these requirements to someone who will implement them, and you will not be in the
-   room. Which single one would you rewrite first, and why?
+The assistant did well at turning the six use cases into structured user stories. It quickly created clear stories for Student and Administrator and covered all six use cases. Doing this manually would have taken me longer, especially keeping the roles and story format consistent.
 
-Be specific. "The AI was useful" is worth nothing; "UC-06 had no story behind it until I wrote
-US-07, and the checker is what told me" is worth everything.
+If I handed these requirements to a developer, I would rewrite US-02 Book room first. Booking depends directly on R1, R2, R3 and R4, so unclear boundary behavior could cause different implementations. I would make the time, duration, overlap and blocked-room rules explicit before implementation.
