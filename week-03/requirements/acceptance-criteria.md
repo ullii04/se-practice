@@ -8,66 +8,73 @@ three happy paths.
 
 ## Assumptions
 
-These must settle the two questions the scenario leaves open. Either answer is accepted; no answer
-is not.
-
-- **Overlap:** a booking that ends exactly when another begins is TODO (allowed / not allowed) under R3, because TODO.
-- **Duration:** a booking of exactly two hours is TODO (allowed / not allowed) under R2, because TODO.
-- TODO (any further assumption you needed)
+- **Overlap:** a booking that ends exactly when another begins is allowed under R3, because the bookings touch at the boundary but their time periods do not overlap.
+- **Duration:** a booking of exactly two hours is allowed under R2, because "at most two hours" includes exactly two hours.
+- A student can cancel only a booking they made.
 
 ---
 
-## US-TODO — <story title>
+## US-02 — Book Room
 
 ### AC-01
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** the room is available and not blocked, and the selected start time is in the future
+- **When** the student books the room for a time slot of two hours or less
+- **Then** the booking is created successfully and the selected time slot becomes unavailable.
 
 ### AC-02
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** the selected time slot starts in the past or at the current time
+- **When** the student tries to book the room
+- **Then** the booking is rejected.
 
 ### AC-03
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
-
----
-
-## US-TODO — <story title>
+- **Given** an available and unblocked room is selected
+- **When** the student requests a booking lasting exactly two hours
+- **Then** the booking is allowed, provided the other booking rules are satisfied.
 
 ### AC-04
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** the room already has an existing booking
+- **When** the student requests a time slot that overlaps the existing booking
+- **Then** the booking is rejected; a booking starting exactly when the existing booking ends is allowed.
 
 ### AC-05
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
-
-### AC-06
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** the room is blocked
+- **When** the student tries to book the room
+- **Then** the booking is rejected.
 
 ---
 
-## US-TODO — <story title>
+## US-03 — Cancel Booking
+
+### AC-06
+- **Given** the student has an existing booking that they made
+- **When** the student cancels the booking
+- **Then** the booking is removed and the time slot becomes available again if the room is not blocked.
 
 ### AC-07
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** a booking was made by another student
+- **When** the student tries to cancel that booking
+- **Then** the cancellation is rejected and the booking remains unchanged.
 
 ### AC-08
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** the booking has already been cancelled or does not exist
+- **When** the student tries to cancel it
+- **Then** the cancellation is rejected and no booking is changed.
+
+---
+
+## US-05 — Block or Unblock Room
 
 ### AC-09
-- **Given** TODO
-- **When** TODO
-- **Then** TODO
+- **Given** the administrator selects an unblocked room
+- **When** the administrator blocks the room
+- **Then** the room becomes blocked and students cannot create new bookings for it.
+
+### AC-10
+- **Given** the room is currently blocked
+- **When** the administrator unblocks the room
+- **Then** the room becomes available for booking again, subject to existing bookings.
+
+### AC-11
+- **Given** an unblocked room has an existing future booking
+- **When** a student requests another booking that overlaps the existing booking
+- **Then** the new booking is rejected.
