@@ -1,0 +1,44 @@
+@startuml
+actor Student
+participant BookingService
+database BookingRepository
+
+Student -> BookingService: bookRoom(studentId, roomId, startTime, endTime)
+
+BookingService -> BookingService: validateFutureStart(startTime)
+BookingService -> BookingService: validateDuration(startTime, endTime)
+BookingService -> BookingRepository: isRoomBlocked(roomId)
+BookingRepository --> BookingService: blockedStatus
+BookingService -> BookingRepository: hasOverlappingActiveBooking(roomId, startTime, endTime)
+BookingRepository --> BookingService: overlapStatus
+
+alt all validations passed
+    BookingService -> BookingRepository: createBooking(studentId, roomId, startTime, endTime)
+    BookingRepository --> BookingService: bookingCreated
+    BookingService --> Student: bookingConfirmation
+else invalid start time or duration
+    BookingService --> Student: bookingRejected(R1)
+else room blocked
+    BookingService --> Student: bookingRejected(R3)
+else overlapping active booking
+    BookingService --> Student: bookingRejected(R2)
+end
+
+note right of BookingService
+R1: startTime is in the future and
+duration is > 0 and <= 2 hours.
+
+R2: Active bookings for the same
+room must not overlap.
+
+R3: A blocked room cannot accept
+a new booking.
+
+R4: Confirmation is returned only
+after successful creation.
+
+Assumption: bookings whose time
+boundaries only touch do not overlap.
+end note
+
+@enduml
