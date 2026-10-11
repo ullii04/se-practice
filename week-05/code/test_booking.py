@@ -74,3 +74,24 @@ class BookingTests(unittest.TestCase):
 
     def test_one_minute_overlap_is_rejected(self):
         self.assertIs(can_book(659, 719, 540, False, [(600, 660)]), False)
+
+    def test_last_minute_of_day_is_allowed(self):
+        self.assertIs(can_book(1439, 1440, 1438, False, []), True)
+
+    def test_float_start_is_rejected_by_declared_policy(self):
+        self.assertIs(can_book(600.5, 660, 540, False, []), False)
+
+    def test_float_end_is_rejected_by_declared_policy(self):
+        self.assertIs(can_book(600, 660.5, 540, False, []), False)
+
+    def test_string_start_is_rejected_by_declared_policy(self):
+        self.assertIs(can_book("600", 660, 540, False, []), False)
+
+    def test_string_end_is_rejected_by_declared_policy(self):
+        self.assertIs(can_book(600, "660", 540, False, []), False)
+
+    def test_boolean_start_is_rejected_by_declared_policy(self):
+        self.assertIs(can_book(True, 2, 0, False, []), False)
+
+    def test_boolean_end_is_rejected_by_declared_policy(self):
+        self.assertIs(can_book(1, True, 0, False, []), False)
