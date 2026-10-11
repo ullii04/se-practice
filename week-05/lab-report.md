@@ -25,10 +25,61 @@ My Week 04 submission.yml declares overlap_touching_bookings: allowed. This agre
 
 ## 2. Task 1 — the plan
 
+**Planning prompt sent in the separate implementation chat:**
+
+```text
+Propose a short implementation plan for can_book. List the checks in order and identify assumptions. Use Python 3 and the supplied rules. Do not write code yet. Suggest boundary cases that could expose an incorrect implementation.
+```
+
 **The assistant's plan, pasted unedited:**
 
 ```text
-(paste here)
+Implementation Plan for can_book()
+1. Checks in Order
+Validate time range (AC1):
+
+Check 0 <= start < end <= 1440.
+Check start > now.
+Return False if either condition fails.
+Check duration (AC2):
+
+Calculate end - start.
+Return False if duration exceeds 120 minutes.
+Check room status (AC3):
+
+Return False if blocked is True.
+Check booking overlaps (AC4):
+
+Loop through existing bookings.
+Overlap occurs when start < existing_end and end > existing_start.
+Return False if any overlap exists.
+Touching endpoints are allowed.
+Return decision (AC5):
+
+Return True only if all checks pass.
+Never modify existing or other inputs.
+2. Assumptions
+All times are integer minutes on the same date.
+now is valid (0–1439).
+blocked is a Boolean.
+existing contains only valid, active bookings for the selected room.
+Intervals include the start but exclude the end.
+The function only checks availability; saving and confirmation happen elsewhere.
+3. Boundary Test Cases
+Test	Condition	Expected
+1	start == now	False
+2	start == now + 1 with all other checks passing	True
+3	start == end	False
+4	end == 1440 with all other checks passing	True
+5	Duration = 120 minutes	True
+6	Duration = 121 minutes	False
+7	blocked == True	False
+8	New booking starts exactly when an existing booking ends	True
+9	New booking ends exactly when an existing booking starts	True
+10	New booking overlaps an existing booking by 1 minute	False
+11	existing is empty and all other checks pass	True
+12	start < 0 or end > 1440	False
+Key point: The implementation must reject invalid bookings, allow touching endpoints, and keep all inputs unchanged.
 ```
 
 **What the plan invented or changed.** One row for every rule in the plan that is not in the
@@ -37,11 +88,11 @@ row saying which lines of the plan you checked against which AC.
 
 | # | What the plan said | What the contract or the AC says | What I did |
 | --- | --- | --- | --- |
-| 1 | | | |
+| 1 | No invented rule found: range and future-start checks; duration check; blocked check; overlap loop; final Boolean decision with unchanged inputs. | These map respectively to AC1, AC2, AC3, AC4 and AC5. The assumptions repeat the contract. | Retain the plan. For boundary cases expecting True, ensure every other AC also holds; these examples are not unconditional permissions. |
 
 **Boundary cases the assistant suggested that I kept as tests:**
 
--
+- Planned for the suite: start equal to now and one minute after now; zero duration; end at 1440; durations 120 and 121; blocked room; touching on either side; one-minute overlap; empty existing; day-bound violations. Tests have not yet been implemented or run.
 
 ---
 
