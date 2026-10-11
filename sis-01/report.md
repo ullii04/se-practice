@@ -18,19 +18,40 @@
 
 ## 2. Analysis
 
-(write here)
+Privacy, accuracy and accountability should shape this fictional system. My first engineering decision is to define access by task: students view their own grades, while teachers enter or correct grades for assigned classes. Replacement teachers need explicitly authorized temporary permissions. I would limit those permissions to the relevant class and end them when the replacement role ends. This applies the privacy protection described in ACM section 1.6; the particular permission design is my recommendation, not a rule directly specified by the code.
+
+Collecting only information needed for grading also follows the principle described in section 1.6. Restricted access can make legitimate corrections less convenient, so the school must identify who can authorize exceptions. Giving every teacher unrestricted access would simplify administration but increase unnecessary exposure. Applicable local law remains unverified; an ethical argument does not establish legal compliance.
+
+My second engineering decision is a complete error reporting workflow with assigned owners and follow-up deadlines agreed with the school. A coordinator receives reports, tracks investigations and informs students of outcomes. Teachers confirm academic records and approve grade changes. Developers investigate the relevant software component: frontend display problems and backend calculation problems may need different investigations. This replaces my original view that backend developers should handle every error. The trade-off is additional coordination work, but a report button without follow-through leaves the central risk unresolved.
+
+For accuracy, teachers should approve calculation, rounding and missing-mark rules. Developers should compare results against independently prepared expected answers and test access restrictions. Simple range checks cannot detect every incorrect entry; comparison with an approved record may reveal discrepancies, although that record may also be wrong. This is a design distinction, not a finding established by the ethics sources. Clause 3.10 requires adequate testing, debugging and review; it does not promise zero errors or specify our exact tests.
+
+The two-week deadline and two-person team require prioritization. I would estimate essential tasks and postpone decorative features while retaining readable results and clear error messages. Live release should wait if essential access checks or agreed grading cases fail. A demonstration using fictional records is an alternative when readiness is uncertain. Incorrect results may affect academic decisions, but scholarship loss and career effects remain conditional because no relevant institutional policy has been verified.
 
 ## 3. Review
 
-(write here)
+I accepted Prompt B concerns 1–6 and partly accepted concern 7. For concern 1, temporary replacement-teacher access makes the permissions proposal more realistic. For concern 2, the initial claim that validation cannot establish correctness was too absolute: range checking and comparison with a reference record are different. For concern 3, expected results and release conditions need approval, because passing tests based on misunderstood rules would be misleading.
+
+I accepted concern 4 because reporting needs an owner and follow-up, not just a button. Concern 5 changed my original view that backend developers should handle every error: responsibility should be shared, with a named coordinator. I accepted concern 6 because two weeks is a constraint, not evidence that a safe release is achievable.
+
+For concern 7, I retain my disagreement with any implication that ethical discussion is impossible without references. However, descriptions of professional codes require evidence, and local legal compliance remains unresolved. Verification row 1 connects the privacy recommendation with ACM section 1.6. It supports necessary data collection and protection from unauthorized access, without proving a particular permission design sufficient. Verification row 2 connects the testing recommendation with IEEE-CS/ACM clause 3.10. It supports testing, debugging and review, without guaranteeing correctness or schedule feasibility.
+
+My selected revisions are explicit temporary access and a complete reporting workflow with owners and agreed follow-up deadlines, recorded in change-log rows 1–2. These address privacy exceptions and unresolved grade errors. I supplied the source notes; the assistant's page retrieval was blocked. The notes support professional duties, not scholarship rules or local law. Those consequences and obligations remain qualified rather than presented as verified facts.
 
 ## 4. Conclusion
 
-(write here)
+I recommend a grade system that prioritizes restricted access, accurate calculations and a correction process that actually reaches an outcome. My main priorities are temporary permissions for legitimate exceptions and assigned owners who track reports against agreed follow-up deadlines. Shared responsibility should not mean that nobody coordinates the response. Teachers should decide academic correctness, while developers investigate technical faults in the relevant components. The main limitation is that two developers working for two weeks may not complete and check every essential safeguard. If readiness is uncertain, the team should demonstrate the system with fictional data and postpone live use. Professional ethics guidance supports these priorities, but local policies, legal obligations and operational feasibility still need checking.
 
 ## 5. Reflection
 
-(write here)
+The two measures I most want to keep:
+
+1. Clearly define access rules and special temporary access rights (such as for replacement teachers). Grades are private data. Following the ACM code of ethics, we need to implement the least privilege principle and cover real-world scenarios like substitute teachers to prevent permission loopholes.
+2. Build a complete error reporting workflow with assigned owners and follow-up deadlines. A simple report button cannot resolve grade disputes. We need dedicated people to receive, track and give feedback to close issues properly.
+
+I originally thought backend developers should handle every system error. Now I realise responsibility should be shared, but a named coordinator is required. Frontend display bugs and backend calculation errors need different people to investigate.
+
+I learned that software design must cover edge cases, clear accountability and ethical rules, not only normal functions. Next time for similar work, I will look up ACM and IEEE ethics standards at the draft stage. I will define release criteria, responsible roles and exception scenarios early instead of adding them later.
 
 ## 6. References
 
