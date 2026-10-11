@@ -98,21 +98,44 @@ row saying which lines of the plan you checked against which AC.
 
 ## 3. Task 2 — the first version (v1), read before it was run
 
-v1 is saved as `code/original/booking_v1.<ext>`, exactly as the assistant returned it: yes / no
+v1 is saved as `code/original/booking_v1.py`, exactly as the assistant returned it: yes
 
-**AC map.** One row per condition in v1. Quote the line.
+**Implementation prompt sent in the same implementation chat:**
+
+```text
+Implement can_book in booking.py using the supplied contract and AC1-AC5. Keep the signature. Use only the standard library. Do not modify existing. Return the function and explain each condition. Keep the feature within the stated scope.
+```
+
+**AC map.** Prepared with AI assistance for reading before running v1. These are static assessments, not test results.
 
 | # | Line in v1 | AC it implements | Correct as written? If not, why |
 | --- | --- | --- | --- |
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
+| 1 | Line 3: `if not (0 <= start < end <= 1440):` | AC1 | Yes, rejects invalid order and day bounds; end 1440 is allowed. |
+| 2 | Line 6: `if start <= now:` | AC1 | Yes, start must be strictly later than now. |
+| 3 | Line 10: `if end - start > 120:` | AC2 | Yes, 120 is allowed and 121 is rejected. |
+| 4 | Line 14: `if blocked:` | AC3 | Yes, blocked is guaranteed Boolean by the contract. |
+| 5 | Lines 18–20: `for existing_start, existing_end in existing:` and `if start < existing_end and end > existing_start:` | AC4 | Yes, both strict inequalities identify overlap; equality on either side permits touching. Every booking is considered unless an overlap already rejects the request. |
+| 6 | Line 23: `return True`; earlier rejection branches use `return False` | AC5 | Yes, Boolean True is returned only after all checks pass. The function reads existing without sorting, appending, deleting or assigning its elements. |
 
 **Anything in v1 that no AC asks for** (extra validation, a buffer between bookings, logging,
 saving the booking, a different return type):
 
--
+- None found on inspection for contract-valid inputs. Non-integer behavior is not specified and remains to be investigated and declared in section 9.2.
+- Pre-run prediction: no failure expected for inputs covered by AC1–AC5. This prediction is not evidence of passing tests; no code has been run at this stage.
+
+**The assistant's explanation, preserved from the supplied response:**
+
+1. **AC1 — Valid time:** Ensures `start` and `end` are within 0–1440, `start < end`, and `start > now`.
+2. **AC2 — Duration:** Rejects bookings longer than 120 minutes. Exactly 120 minutes is allowed.
+3. **AC3 — Blocked room:** Returns `False` when the room is blocked.
+4. **AC4 — Overlap:** Rejects bookings that overlap existing reservations. Touching endpoints are allowed because intervals are `[start, end)`.
+5. **AC5 — Final decision:** Returns `True` only when all conditions pass.
+
+**Scope:** The function checks one selected room and returns a Boolean. It does not save bookings, generate confirmations, or modify `existing`.
+
+This implementation uses no imports or external libraries and stays within the supplied requirements.
+
+The first pasted copy in the coordination chat lost line breaks. The student recopied the original code with its line breaks and indentation before it was saved. The function was not reformatted or repaired by the coordinating assistant.
 
 ---
 
