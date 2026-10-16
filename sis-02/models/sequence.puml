@@ -1,3 +1,83 @@
-' SIS #02 — your FINAL sequence diagram goes here, as PlantUML (@startuml … @enduml).
-' Start from the AI's original in models/original/sequence.puml, apply your accepted review
-' decisions, then render it to models/img/sequence.png (or .svg). README section 5.
+@startuml
+title University Course Registration - Sequence Diagram
+
+actor Student
+participant "Registration System" as System
+database "Course Catalog" as Catalog
+participant "Registration Service" as Service
+database "Enrollment Store" as Store
+
+== Browse Catalog (R1) ==
+
+Student -> System: View catalog(semester)
+System -> Catalog: Get offerings(semester)
+Catalog --> System: Courses, offerings, capacity, enrollment counts
+System -> System: Calculate available places
+System --> Student: Show code, title, offering, available places
+
+note over System
+R1, AC-01, AC-02:
+Catalog browsing does not reserve places.
+Available = capacity - enrollment count.
+end note
+
+== Request Registration (R2-R5) ==
+
+Student -> System: Register(offeringId)
+System -> Service: Register(studentId, offeringId)
+
+group Atomic registration operation (R2, R3, R4, AC-03, AC-04)
+
+    note over Service, Store
+    Duplicate checking, current capacity checking,
+    and Enrollment creation are protected
+    within one atomic transaction.
+
+    Concurrent requests cannot exceed capacity.
+    The transaction commits only after
+    successful creation.
+    end note
+
+    Service -> Store: Begin atomic transaction
+    Store --> Service: Transaction started
+
+    Service -> Store: Check existing enrollment(studentId, offeringId)
+    Store --> Service: Enrollment exists?
+
+    alt Already enrolled (R3, R5, AC-06)
+
+        Service -> Store: Rollback transaction
+        Store --> Service: No changes
+        Service --> System: Reject("already enrolled")
+
+    else Not enrolled
+
+        Service -> Store: Get current enrollment count(offeringId)
+        Store --> Service: Current count and capacity
+
+        alt Course full: count >= capacity (R2, R5, AC-05)
+
+            Service -> Store: Rollback transaction
+            Store --> Service: No changes
+            Service --> System: Reject("course full")
+
+        else Not enrolled and places left: count < capacity (R2, R4, AC-03)
+
+            Service -> Store: Create exactly one Enrollment(studentId, offeringId)
+            Store --> Service: One Enrollment created; count increased by 1
+
+            Service -> Store: Commit transaction
+            Store --> Service: Transaction committed
+
+            Service -> Service: Recalculate available places\n= capacity - updated enrollment count
+
+            Service --> System: Registration confirmed
+
+        end
+    end
+
+end
+
+System --> Student: Confirmation or rejection reason
+
+@enduml
