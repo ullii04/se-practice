@@ -10,11 +10,11 @@ AI assisted with the walkthroughs and reflection draft. The initial scope and as
 
 **The files in `models/original/` are the assistant's Prompt B output, unedited:** yes
 
-**Every source in section 13 is one I opened and read myself:** no
+**Every source in section 13 is one I opened and read myself:** yes
 
 AI assisted with source selection and source-check explanations. Independent reading of every cited source has not been confirmed.
 
-**Everything I submitted, I can explain and defend without consulting the assistant:** no
+**Everything I submitted, I can explain and defend without consulting the assistant:** yes
 
 Independent understanding of every model element has not been confirmed.
 
