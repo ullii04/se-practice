@@ -1,0 +1,69 @@
+@startuml
+title University Course Registration - Domain Class Diagram
+
+skinparam classAttributeIconSize 0
+
+class Student {
+    +studentId: String
+    +name: String
+}
+
+class Course {
+    +courseCode: String
+    +title: String
+}
+
+class CourseOffering {
+    +offeringId: String
+    +semester: String
+    +capacity: Integer
+    +getAvailablePlaces(): Integer
+}
+
+class Enrollment {
+    +enrollmentId: String
+}
+
+Course "1" -- "0..*" CourseOffering : has
+Student "1" -- "0..*" Enrollment : makes
+CourseOffering "1" -- "0..*" Enrollment : receives
+
+note right of CourseOffering
+R2: capacity > 0
+
+R2, R4:
+availablePlaces =
+capacity - current enrollment count
+
+enrollment count <= capacity
+
+Availability is derived from
+the current enrollment count.
+end note
+
+note bottom of Enrollment
+R3: A student may have at most
+one Enrollment in the same offering.
+
+Unique(studentId, offeringId)
+
+R4, AC-03:
+Successful registration creates
+exactly one Enrollment.
+
+Enrollment count increases by 1.
+
+R5, AC-05, AC-06:
+Rejected registration creates
+no Enrollment.
+Enrollment count remains unchanged.
+end note
+
+note bottom of Course
+A Course describes a subject.
+A CourseOffering represents
+one scheduled section
+in one semester.
+end note
+
+@enduml
