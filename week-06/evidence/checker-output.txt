@@ -1,0 +1,35 @@
+Week 06 - prototype cleanup: the exports, the screenshots, the evidence
+
+PASS   P1   final prototype exported to prototype/                     prototype/project: 15 source files
+PASS   P2   exports are clean: no node_modules, no .env, under 5 MB    clean
+PASS   P3   final stays in scope: no network, storage, backend, login  nothing out of scope found in the source
+PASS   O1   v1 export kept in original/                                original/project
+PASS   O2   final differs from v1                                      7 file(s) changed, e.g. package.json, src/App.tsx, src/components/RoomList.tsx
+PASS   E1   v1 screenshot: evidence/v1.png                             evidence/v1.png
+PASS   E2   one screenshot per logged issue: evidence/issue-N.png      2 issue screenshot(s)
+PASS   E3   nine final screenshots, all different                      final-T1 ... final-T9
+PASS   E4   T9 taken at narrow width (portrait)                        375x1542
+PASS   T1   T1 Touching: final result is Available                     final: Available
+PASS   T2   T2 Overlap: final result is Unavailable                    final: Unavailable
+PASS   T3   T3 Blocked: final result is Unavailable                    final: Unavailable
+PASS   T4   T4 Exactly 2 hours: final result is Available              final: Available
+PASS   T5   T5 Over 2 hours: final result is Unavailable               final: Unavailable
+PASS   T6   T6 Starts now: final result is Unavailable                 final: Unavailable
+PASS   T7   T7 Reversed times: final result is Unavailable             final: Unavailable
+PASS   T8   T8 Same check twice: final result is Available             final: Available
+PASS   T9   T9 Narrow screen: final result is Available                final: Available
+PASS   L1   report 1: tool, model and project link                     tool, model and project link recorded
+FAIL   L2   report 2: two predictions and the initial prompt as sent   section 2 needs the initial prompt as sent, with its fixed sentences unchanged
+PASS   L3   report 3: what v1 consists of and what works               v1 listing pasted; 9 line(s) on what works
+PASS   L4   report 4: the v1 result of all nine cases                  v1 result recorded for all nine cases
+PASS   L5   report 5: issue log, two issues or more                    2 issue(s) logged
+FAIL   L6   report 6: the cleanup prompts, each suggestion judged      section 6 needs the functional fix prompt, pasted as sent; the cleanup prompt, pasted as sent
+PASS   L7   report 7: change log of 2-4 changes                        4 change(s) logged
+PASS   L8   report 8: one component explained, in 60 words or more     src/lib/validation.ts explained in 168 words
+PASS   L9   report 10: conclusion of 120-180 words                     158 words
+------------------------------------------------------------------------------
+v1 (original/) has out-of-scope code: backend or database - a candidate for your issue log (section 5).
+Cases matching the expected result: v1 0 of 9 - final 9 of 9.
+SUMMARY pass=25 fail=2 error=0   (27 checks)
+Every FAIL or ERROR you keep goes in lab-report.md section 9.1 and in submission.yml known_fails.
+One you report and explain costs you nothing. One you hide costs the whole criterion.
