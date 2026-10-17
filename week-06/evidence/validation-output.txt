@@ -1,0 +1,19 @@
+Week 06 submission.yml - shape only, never quality   (submission.yml)
+
+PASS   D1   schema and week                                          schema 1, week 06
+PASS   D2   student.name                                             student.name: Elshibai Ulzhalgas
+PASS   D3   student.student_id                                       student.student_id: 24B031019
+PASS   D4   student.github                                           student.github: ullii04
+PASS   D5   assistant.tool (and why, if not Bolt.new)                assistant.tool: Bolt.new
+PASS   D6   assistant.model is an exact model name or not displayed  assistant.model: not displayed
+PASS   D7   bolt.project_url                                         bolt.project_url: https://bolt.new/~/sb1-g3bmtzgh
+PASS   D8   checker numbers add up                                   pass + fail + error = 27
+PASS   D9   checker numbers match a run made now                     declared 25/2/0, a run now gives 25/2/0
+PASS   D10  checker.commit                                           checker.commit: 97902c1
+PASS   D11  known_fails lists exactly what still fails               known_fails matches the checker: ['L2', 'L6']
+FAIL   D12  counts match lab-report.md                               counts.cleanup_prompts must be 1 or more
+PASS   D13  assumptions.end_of_day is decided                        end_of_day: not-expressible
+PASS   D14  review_findings: three, each naming what it is about     4 review findings
+PASS   D15  honesty block answered                                   honesty block answered
+------------------------------------------------------------------------------
+SUMMARY pass=14 fail=1 error=0   (15 checks)

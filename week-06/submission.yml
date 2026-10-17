@@ -1,0 +1,36 @@
+schema: 1
+week: "06"
+student:
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  github: "ullii04"
+assistant:
+  tool: "Bolt.new"
+  model: "not displayed"
+  fallback_reason: "none"
+bolt:
+  project_url: "https://bolt.new/~/sb1-g3bmtzgh"
+counts:
+  issues: 2
+  cleanup_prompts: 0 # Historical count unknown; no new Bolt prompts in recovery.
+  change_log_rows: 4
+  v1_matches: 0
+  final_matches: 9
+checker:
+  pass: 25
+  fail: 2
+  error: 0
+  commit: "e374febcdfa78bbf732f9f4d2bdef22bad22a589"
+  known_fails: [L2, L6]
+assumptions:
+  end_of_day: "not-expressible"
+review_findings:
+  - "AC1: T6 returned Available before strict equality rejection was repaired by Codex."
+  - "v1: no supplied-time control and no room with the required single booking prevents the exact baseline."
+  - "AC1: native time input and App.tsx parser do not support the permitted end time 24:00."
+  - "T8: both repeated checks returned Available without adding a booking."
+honesty:
+  v1_export_unedited: yes
+  screenshots_unedited: yes
+  can_explain_component_without_ai: no
+  ai_usage_disclosed: yes
