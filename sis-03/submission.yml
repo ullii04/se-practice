@@ -1,0 +1,39 @@
+schema: 1
+assignment: "sis-03"
+student:
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  group: "Monday 16:00-19:00"
+  github: "ullii04"
+assistant:
+  tool: "ChatGPT / Codex"
+  model: "GPT-6"
+bolt:
+  model: "not displayed"
+  project_url: "https://bolt.new/~/sb1-g3bmtzgh"
+language:
+  name: "python"
+  path: "A"
+reuse:
+  python_v1: "week-05"
+  web_v1: "week-06"
+checker:
+  pass: 53
+  fail: 1
+  error: 1
+  commit: "3e70af8"
+counts:
+  tests: 29
+  exchanges: 4
+  issues: 2
+  critique_decisions: 3
+  reflection_words: 174
+cases:
+  python_final_matches: 11
+  page_final_matches: 9
+known_fails: [C4, X4]
+honesty:
+  v1_unedited: no
+  screenshots_unedited: no
+  results_observed: yes
+  ai_usage_disclosed: yes
