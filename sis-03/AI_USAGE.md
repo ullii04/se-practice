@@ -1,30 +1,17 @@
 # AI Usage Disclosure — SIS #03
 
-Required by the course academic policy (Generative AI use level **D — AI-integrated**).
-You are responsible for the accuracy, testing and integrity of everything you submit,
-including anything an AI tool produced.
-
-| Tool | Exact model / plan | Used for | Which files it touched | Reused from |
+| Tool | Model | Use | Files | Source |
 | --- | --- | --- | --- | --- |
-| | | the plan (stage A) | | this SIS / week-05 |
-| | | Python v1 (stage B) | `code/original/booking_v1.py` | this SIS / week-05 |
-| Bolt.new | | web prototype v1 (stage B) | `web/original/` | this SIS / week-06 |
-| | | critique (stage C) | | this SIS |
-| | | repair (stage D) | | this SIS |
+| ChatGPT Work / Codex desktop | not displayed in saved exchanges | Plan, Python generation and critique; see report section 11 B1–B3 | Python artifacts and report | week-05 |
+| Bolt.new | not displayed | Web prototype generation; original prompt unavailable | web/original/ | week-06 |
+| ChatGPT / Codex | not displayed in saved exchange | Recorded repair summary; verbatim exchange unavailable | web/final/ | week-06 |
+| ChatGPT / Codex | GPT-6 (as recorded in report section 1) | SIS report preparation and this report repair: headings, tables, file paths, fresh test output, declaration and known fails | report.md, submission.yml, AI_USAGE.md | this SIS |
 
-**The assistant wrote, or helped write, my tests in `code/`:** yes / no
-<!-- Either answer is allowed. If "yes": say which tests, and how you checked that their EXPECTED
-     values come from AC1–AC5 and not from what the generated code happens to return. -->
+The existing 29 Python tests were retained without changes in this repair. Their historical authorship was not independently established from the available records. Expected outcomes were checked against AC1–AC5: future start and day bounds, duration at most 120 minutes, blocked status, overlap with touching allowed, Boolean results and unchanged inputs. Type-policy tests cover an additional declared policy outside the original contract.
 
-**`code/original/` and `web/original/` hold the AI's first versions exactly as returned:** yes / no
+The current repair ran all 29 unit tests and the supplied checker. It did not rerun the webpage cases. Previously recorded web observations remain attributed to Week 06; untested T10 remains Not testable. The Bolt prompt and repair response summaries are explicitly identified as incomplete historical evidence.
 
-**Every result in report.md section 5 was actually run or seen, not assumed:** yes / no
+Original exports and screenshots were unchanged by this repair. Their pre-existing provenance cannot be independently certified. Student understanding and personal attestation require the student's own review; no signature is supplied by the assistant.
 
-**Everything I submitted, I can explain and defend in class — including the overlap condition
-and what the agent did in section 9:** yes / no
-
-**Anything I accepted from the AI without fully understanding it:**
-<!-- Name the file and the line. An honest entry here costs far less than a blank one that turns out to be untrue. -->
-
-Signed: <your name>
-Date:
+Student: Elshibai Ulzhalgas
+Updated: 2026-10-24

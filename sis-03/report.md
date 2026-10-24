@@ -70,20 +70,16 @@ The original Python function already implements the main acceptance criteria cor
 The exact original Bolt.new prompt was not preserved in the Week 06 records. The project export contains a generic `.bolt/prompt` configuration, but that file is not evidence of the actual message sent to Bolt.
 The following is a reconstruction of the requirements, **not a verbatim historical prompt**:
 > Build a room-booking availability checker using React and TypeScript. Check that the start time is in the future, the end time is later than the start, the duration is at most 120 minutes, the room is not blocked, and the requested time does not overlap an existing booking. Touching endpoints should be allowed. Show Available or Unavailable with clear feedback. Keep the layout usable on narrow screens. Do not add login, backend services, a database, network requests or persistent storage.
-| File | Purpose |
-| --- | --- |
-| `web/original/src/App.tsx` | Main application and booking interface |
-| `web/original/src/components/RoomList.tsx` | Room selection and room information |
 **What v1 does:**
 The original Bolt prototype displayed a room-booking interface and availability feedback. However, it used the computer's current time and different existing bookings from the required test fixture. Because of this, I could not reproduce the exact SIS test conditions in the original version.
 The original prototype was preserved in `web/original/`. The final version was copied separately to `web/final/`, allowing both versions to be compared.
 **Generated files in the original Bolt export:**
-| File | Purpose |
-| --- | --- |
-| `web/original/src/App.tsx` | Main room-booking interface |
-| `web/original/src/components/RoomList.tsx` | Displays the available rooms |
-| `web/original/src/components/ResultBanner.tsx` | Shows booking availability feedback |
-| `web/original/src/lib/validation.ts` | Contains input validation logic |
+| # | File (relative to web/original/) | Purpose |
+| --- | --- | --- |
+| 1 | `src/App.tsx` | Main room-booking interface |
+| 2 | `src/components/RoomList.tsx` | Displays the available rooms |
+| 3 | `src/components/ResultBanner.tsx` | Shows booking availability feedback |
+| 4 | `src/lib/validation.ts` | Contains input validation logic |
 ## 5. Test cases — executed on both artifacts
 Base conditions unless stated otherwise:
 `now = 540`, `blocked = False`, `existing = [(600, 660)]`
@@ -111,15 +107,16 @@ The Python results were verified by the supplied checker. The final webpage resu
 | AC4 | `code/booking.py`, overlap loop | T1, T2, T10 | True, False, False | True, False, False | True, False, False |
 | AC5 | `code/booking.py`, Boolean result and no mutation | T11 | True | True | True |
 | AC6 | `web/final/src/App.tsx`, result feedback and responsive layout | T12 | Available | Not testable | Available |
-**## 7. Issue log
-#	Issue	Reproduction / AC	Priority	Focused prompt / change	Retest
-1	The original page used system time and different bookings.	T1 and AC1: required now=09:00 and existing booking 10:00–11:00 could not be reproduced in the original export; see evidence/issue-1.jpg.	High	Make the test fixture reproducible using now=09:00 and existing booking 10:00–11:00; keep all booking rules unchanged.	The recorded Week 06 final touching-booking scenario returned Available; other exact SIS cases were not all reproduced.
-2	Native time input cannot represent 24:00.	T8 and AC1: end=1440 is valid in Python but cannot be entered as 24:00 in the page; see evidence/issue-2.jpg.	Medium	Review the native time-input boundary and document the end-of-day limitation without adding backend services or storage.	Still unresolved; T8 and T9 on the page remain Not testable.
+## 7. Issue log
+| # | Issue | Reproduction / AC | Priority | Focused prompt / change | Retest |
+| --- | --- | --- | --- | --- | --- |
+| 1 | The original page used system time and different bookings. | T1 and AC1: required now=09:00 and existing booking 10:00–11:00 could not be reproduced in the original export; see evidence/issue-1.jpg. | High | Make the test fixture reproducible using now=09:00 and existing booking 10:00–11:00; keep all booking rules unchanged. | The recorded Week 06 final touching-booking scenario returned Available; other exact SIS cases were not all reproduced. |
+| 2 | Native time input cannot represent 24:00. | T8 and AC1: end=1440 is valid in Python but cannot be entered as 24:00 in the page; see evidence/issue-2.jpg. | Medium | Review the native time-input boundary and document the end-of-day limitation without adding backend services or storage. | Still unresolved; T8 and T9 on the page remain Not testable. |
 
 
-Before / after: Issue 1 is shown by evidence/before-1.jpg and evidence/after-1.jpg. The first shows the original test setup; the second shows the recorded final touching-bookings result.
+**Before / after:** Issue 1 is shown by `evidence/before-1.png` and `evidence/after-1.png`. The first shows the original test setup; the second shows the recorded final touching-bookings result.
 These screenshots support the comparison but do not replace a missing historical AI conversation.
-8. Critique decisions**
+## 8. Critique decisions
 | # | Claim or recommendation reviewed | How I verified it | Decision | Reason |
 | --- | --- | --- | --- | --- |
 | 1 | The Python implementation satisfies AC1–AC5 for contract-valid inputs. | Reviewed every branch and ran the Python test suite. | Accept | The supplied checker and 29 unit tests passed. |
@@ -136,14 +133,15 @@ The Week 05 AI review reported no concrete AC1–AC5 violations in the final Pyt
 | Observation | All 29 Python tests passed. The original webpage could not reproduce the fixed-time fixture. The final export differed from the original. |
 | Next step | Preserve evidence, document limitations, complete the report and rerun the checker. |
 | Human review | I checked the acceptance criteria, reviewed test results and kept the original and final sources separate. |
-**### 9.2 Context, tools and permissions
-#	Item	Description	Observed or Assumed
-1	Context	The assistant used the booking contract, acceptance criteria, Python code and earlier lab records.	Observed
-2	Tools	Git, Python unittest, the SIS checker and local project files were used during the review.	Observed
-3	Permissions	Changes should remain inside the SIS-03 branch, without touching external services or production data.	Assumed
+### 9.2 Context, tools and permissions
+| # | Item | Description | Observed or Assumed |
+| --- | --- | --- | --- |
+| 1 | Context | The assistant used the booking contract, acceptance criteria, Python code and earlier lab records. | Observed |
+| 2 | Tools | Git, Python unittest, the SIS checker and local project files were used during the review. | Observed |
+| 3 | Permissions | Changes should remain inside the SIS-03 branch, without touching external services or production data. | Assumed |
 
 
-9.3 Checkpoint and dependability**
+### 9.3 Checkpoint and dependability
 **Safety checkpoint:** Before accepting a change, I check whether it stays within the booking requirements, avoids unnecessary features, preserves the original versions and keeps the test suite green. I also review the changed files before committing them to Git.
 **Reliability, security, responsibility:** Automated tests help detect incorrect behavior, but they do not prove that every interface scenario works. I compare results with the acceptance criteria and use screenshots as supporting evidence. I avoid adding unnecessary network access, storage, authentication or dependencies. I also separate actual observations from assumptions. If a historical prompt or test result was not saved, I disclose that instead of creating false evidence.
 ## 10. Reflection
@@ -295,10 +293,13 @@ The Week 06 report records two changes:
 The recorded final T6 test rejected a booking starting exactly at now. The final Week 06 test evidence also recorded the remaining scenarios. This is a summary of documented work, not a fabricated verbatim AI response.
 ```
 ## 12. Appendix B — Test output
-**### 12.1 Your suite
-The recorded Python unittest run used:
+### 12.1 Your suite
+The suite was rerun locally on 2026-10-24:
+```bash
 python3 -m unittest discover -s code -p "test_booking.py" -v
-The following is the recorded 29-test output from the earlier run (the elapsed time is environment-dependent):
+```
+Complete output (elapsed time depends on the environment):
+```text
 test_121_minutes_is_rejected (test_booking.BookingTests) ... ok
 test_blocked_room_is_rejected (test_booking.BookingTests) ... ok
 test_boolean_end_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
@@ -333,8 +334,9 @@ test_zero_length_is_rejected (test_booking.BookingTests) ... ok
 Ran 29 tests in 0.000s
 
 OK
-All 29 tests passed in the recorded run.
-12.2 Path B only — three faults you planted**
+```
+
+### 12.2 Path B only — three faults you planted
 | # | Line you broke | AC | Test that failed |
 | --- | --- | --- | --- |
 | 1 | Not applicable — Path A | — | — |
@@ -343,9 +345,11 @@ All 29 tests passed in the recorded run.
 ## 13. Remaining limitations and known fails
 | Check ID or limitation | Why it stays | What I would do next |
 | --- | --- | --- |
-| Original Bolt prompt | The verbatim historical prompt was not preserved. | Save prompts and responses during future development. |
+| X4 — Original Bolt prompt | The verbatim historical prompt was not preserved. | Save prompts and responses during future development. |
 | Repair exchange transcript | The full historical AI prompt and response were not preserved. | Use the available Week 06 code and test evidence; do not invent the transcript. |
 | 24:00 time input | The webpage cannot express an end time of 1440 using the current native time input. | Add a carefully tested end-of-day input option in a future in-scope revision. |
-| SIS-specific web cases | Some scenarios were not independently reproduced with the exact SIS fixture. | Run and document those scenarios separately. |
-| Original export scope warning | The checker flagged possible backend or database code in the original web export. | Inspect the flagged source while preserving the original export. |
-| Complete verbose test output | Only the verified 29-test summary is included here. | Paste the complete output of the current unittest run. |
+| C4 — SIS-specific web cases | Page final T10 was not independently run with the two-booking fixture; its result remains Not testable. T8 and T9 also remain Not testable because of the time-input boundary. | Run and document those scenarios separately. |
+| Original export scope warning | `web/original/package.json:14` declares `@supabase/supabase-js`. This dependency triggers the scope warning; a dependency declaration alone does not prove backend execution. The final package omits it. | Preserve the original export for comparison. |
+
+
+The current repair leaves both original exports and all existing screenshots unchanged. Their provenance before this repair cannot be independently certified; the corresponding submission honesty fields are conservatively marked no. This does not assert that they were edited. Web results remain the previously recorded observations; no new browser runs are claimed.
