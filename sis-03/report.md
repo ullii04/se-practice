@@ -1,338 +1,351 @@
 # SIS #03 — Report: Smart Campus Room Availability Checker
-
-<!-- The ONLY file you write prose in. Keep every numbered heading (## 1. … ## 13.) and every
-     ### sub-heading, and the **Label:** words — the checker finds your answers by them.
-     Replace every "(write here)" and "(paste here)". Delete these <!-- --> comments if you like. -->
-
 ## 1. Setup and reuse
-
-<!-- Model: the exact model with its version, as the tool shows it ("ChatGPT" is a tool, not a
-     model). If the tool does not show it, write: not displayed
-     Reuse: week-05 if code/original/booking_v1.py is your Week 05 v1, copied unedited;
-     week-06 if web/original/ is your Week 06 v1 export; fresh if you generated it for this SIS. -->
-
 | Item | Value |
 | --- | --- |
-| Coding assistant (tool) | (write here) |
-| Coding assistant model | (write here) |
-| Bolt.new model | (write here) |
-| Bolt project link | (write here) |
-| Language | (write here) |
-| Path | (write here) |
-| Python v1 from | (write here) |
-| Web v1 from | (write here) |
-
+| Coding assistant (tool) | ChatGPT / Codex |
+| Coding assistant model | GPT-6 |
+| Bolt.new model | not displayed |
+| Bolt project link | https://bolt.new/~/sb1-g3bmtzgh |
+| Language | Python 3, React, TypeScript |
+| Path | A |
+| Python v1 from | week-05 |
+| Web v1 from | week-06 |
 ## 2. Baseline — before any new AI exchange
-
 ### 2.1 Scope in my own words
-
 **Scope:**
-
-The goal is to check if a new room booking can be accepted. The system should check the start and end times, booking duration, blocked status, and existing bookings. It should reject invalid bookings and avoid time conflicts. The system should show a clear result and work well on mobile devices.
-
+The goal is to check whether a student can book a room at a selected time. The system checks the time range, maximum duration, blocked status and conflicts with existing bookings. It returns a clear availability decision without changing existing booking data. The webpage should also explain invalid input and work on narrow screens.
+The project does not need a login system, database, backend, payment system or permanent booking storage.
 ### 2.2 The acceptance criteria in my own words
-
 | AC | In my own words |
-|---|---|
-| AC1 | The start and end times must satisfy 0 <= start < end <= 1440, and start must be later than now. |
-| AC2 | A booking cannot be longer than 120 minutes. Exactly 120 minutes is allowed. |
-| AC3 | If blocked is True, the booking must be rejected. |
-| AC4 | A new booking cannot overlap with existing bookings, but touching endpoints is allowed. |
-| AC5 | The system should show Available or Unavailable without changing existing bookings. |
-| AC6 | The system should show clear validation messages and work properly on mobile screens. |
-
+| --- | --- |
+| AC1 | The times must satisfy `0 <= start < end <= 1440`, and the start must be later than `now`. |
+| AC2 | A booking cannot last more than 120 minutes. Exactly 120 minutes is allowed. |
+| AC3 | If the room is blocked, the booking must be rejected. |
+| AC4 | A new booking cannot overlap an existing booking, but touching endpoints are allowed. |
+| AC5 | The result must be a clear Boolean in Python or Available/Unavailable on the page, without changing existing bookings. |
+| AC6 | The page should show understandable feedback and remain usable on narrow screens. |
 ### 2.3 Likely failure points
-
 | # | Failure point | AC | How I will check it |
-|---|---|---|---|
-| 1 | A booking starts exactly at the current time. | AC1 | Test start == now and check that it is rejected. |
-| 2 | A booking lasts exactly 120 minutes. | AC2 | Test a 120-minute booking and check that it is accepted if other conditions are valid. |
-| 3 | Two bookings touch at their endpoints. | AC4 | Test a booking that starts exactly when another booking ends. |
-| 4 | The room is blocked. | AC3 | Set blocked to True and check that the booking is rejected. |
-
+| --- | --- | --- | --- |
+| 1 | A booking starts exactly at the current time. | AC1 | Test `start == now` and expect rejection. |
+| 2 | A booking lasts exactly 120 minutes. | AC2 | Check that the booking is allowed when all other conditions pass. |
+| 3 | Two bookings touch at their endpoints. | AC4 | Check that touching does not count as overlap. |
+| 4 | The room is blocked. | AC3 | Set `blocked=True` and expect rejection. |
 ### 2.4 The contract
-
 | Parameter | Meaning | Type and allowed values |
-|---|---|---|
-| `start` | Start time of the new booking | Integer, minutes from 0 to 1440 |
-| `end` | End time of the new booking | Integer, minutes from 0 to 1440 |
-| `now` | Current time in minutes | Integer, minutes from 0 to 1439 |
-| `blocked` | Shows if the room is blocked | Boolean: True or False |
-| `existing` | List of existing bookings | List of intervals with integer start and end times |
-| returns | Booking validation result | Boolean: True if valid, False otherwise |
-
+| --- | --- | --- |
+| `start` | New booking start | Integer minutes within the day |
+| `end` | New booking end | Integer minutes, at most 1440 |
+| `now` | Current time | Integer minutes from 0 to 1439 |
+| `blocked` | Room blocked status | Boolean |
+| `existing` | Existing bookings | List of start/end intervals |
+| returns | Availability decision | Boolean |
+The function signature is:
+`can_book(start, end, now, blocked, existing)`
+The function must not change the existing bookings or other input data. Intervals use a start-inclusive, end-exclusive convention.
 ### 2.5 Initial assumptions and manual checks
-
 **Assumptions:**
-
-1. All time values are integers representing minutes in one day.
-2. Two bookings can share an endpoint without overlapping.
-3. A booking starting exactly at the current time is not allowed.
-4. Checking availability does not change existing bookings.
-
+1. All times are represented as integer minutes on the same day.
+2. Existing booking intervals are valid.
+3. Touching endpoints do not create a conflict.
+4. Availability checking does not save or modify bookings.
 **Planned manual checks:**
-
-- Example 1: If now is 500, a booking from 500 to 600 should be rejected because start equals now.
-- Example 2: If now is 500, a booking from 600 to 720 should be allowed because its duration is exactly 120 minutes, if there are no conflicts.
-- Example 3: An existing booking from 600 to 660 and a new booking from 660 to 720 should not overlap.
-- Example 4: A booking from 600 to 750 should be rejected because it lasts 150 minutes.
-- Example 5: If blocked is True, the booking should be rejected even when the time is valid.
-
+- A booking starting at `now` must be rejected.
+- A booking lasting exactly 120 minutes can be accepted.
+- A booking starting when an existing booking ends can be accepted.
+- A booking lasting 121 minutes must be rejected.
+- A blocked room must reject every request.
 ## 3. Python v1 review
-
-<!-- One row per conditional branch in code/original/booking_v1.py (your language's v1 on
-     Path B). Quote the condition exactly. AC1-AC4 must all appear in the AC column. -->
-
 | Branch in v1 (quoted) | AC | Satisfies it? | Why |
 | --- | --- | --- | --- |
-| (write here) | (write here) | (write here) | (write here) |
-| (write here) | (write here) | (write here) | (write here) |
-| (write here) | (write here) | (write here) | (write here) |
-| (write here) | (write here) | (write here) | (write here) |
-
+| `if not (0 <= start < end <= 1440):` | AC1 | Yes | Rejects invalid ranges and times outside the day. |
+| `if start <= now:` | AC1 | Yes | Rejects bookings starting now or earlier. |
+| `if end - start > 120:` | AC2 | Yes | Rejects bookings longer than 120 minutes. |
+| `if blocked:` | AC3 | Yes | Rejects blocked rooms. |
+| `for existing_start, existing_end in existing:` | AC4 | Yes | Checks all existing bookings. |
+| `if start < existing_end and end > existing_start:` | AC4 | Yes | Detects overlaps while allowing touching endpoints. |
+The original Python function already implements the main acceptance criteria correctly for inputs covered by the contract. The final version adds explicit type validation for invalid input types.
 ## 4. Prototype v1 in Bolt.new
-
 **Prompt as sent:**
-
-~~~~text
-(paste here)
-~~~~
-
-<!-- Main generated files or components, with their path inside web/original/
-     (for example src/App.tsx). At least two. -->
-
-| Generated file or component | Path | Its role |
-| --- | --- | --- |
-| (write here) | (write here) | (write here) |
-| (write here) | (write here) | (write here) |
-
+The exact original Bolt.new prompt was not preserved in the Week 06 records. The project export contains a generic `.bolt/prompt` configuration, but that file is not evidence of the actual message sent to Bolt.
+The following is a reconstruction of the requirements, **not a verbatim historical prompt**:
+> Build a room-booking availability checker using React and TypeScript. Check that the start time is in the future, the end time is later than the start, the duration is at most 120 minutes, the room is not blocked, and the requested time does not overlap an existing booking. Touching endpoints should be allowed. Show Available or Unavailable with clear feedback. Keep the layout usable on narrow screens. Do not add login, backend services, a database, network requests or persistent storage.
+| File | Purpose |
+| --- | --- |
+| `web/original/src/App.tsx` | Main application and booking interface |
+| `web/original/src/components/RoomList.tsx` | Room selection and room information |
 **What v1 does:**
-
-- (write here)
-
+The original Bolt prototype displayed a room-booking interface and availability feedback. However, it used the computer's current time and different existing bookings from the required test fixture. Because of this, I could not reproduce the exact SIS test conditions in the original version.
+The original prototype was preserved in `web/original/`. The final version was copied separately to `web/final/`, allowing both versions to be compared.
+**Generated files in the original Bolt export:**
+| File | Purpose |
+| --- | --- |
+| `web/original/src/App.tsx` | Main room-booking interface |
+| `web/original/src/components/RoomList.tsx` | Displays the available rooms |
+| `web/original/src/components/ResultBanner.tsx` | Shows booking availability feedback |
+| `web/original/src/lib/validation.ts` | Contains input validation logic |
 ## 5. Test cases — executed on both artifacts
-
-<!-- Base for every case unless the row says otherwise: now = 540, blocked = False,
-     existing = [(600, 660)]. Do not change the first four columns.
-     Python columns: True, False or Error (it raised) — what the call actually returned.
-       T11: the result of the SECOND call. T12: n/a.
-       Path A: the checker runs both of your files on T1-T11 and compares (C2, C3).
-     Page columns: Available, Unavailable or Not testable — what the page actually showed.
-     Never write a result you did not observe. -->
-
+Base conditions unless stated otherwise:
+`now = 540`, `blocked = False`, `existing = [(600, 660)]`
 | Case | Name | Input | Expected | Python v1 | Python final | Page v1 | Page final |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | Touching | 660–720 | Available | | | | |
-| T2 | Overlap | 630–690 | Unavailable | | | | |
-| T3 | Blocked | 660–720, blocked | Unavailable | | | | |
-| T4 | Exactly 120 min | 720–840 | Available | | | | |
-| T5 | 121 min | 720–841 | Unavailable | | | | |
-| T6 | Starts now | 540–570 | Unavailable | | | | |
-| T7 | Reversed | 720–660 | Unavailable | | | | |
-| T8 | Ends at midnight | 1380–1440 | Available | | | | |
-| T9 | Past midnight | 1380–1441 | Unavailable | | | | |
-| T10 | Second booking | 720–780, existing (600–660), (700–760) | Unavailable | | | | |
-| T11 | Same check twice | 660–720, twice | Available | | | | |
-| T12 | Narrow screen | T1 at ~375 px wide | Available | n/a | n/a | | |
-
+| T1 | Touching | 660–720 | Available | True | True | Not testable | Available |
+| T2 | Overlap | 630–690 | Unavailable | False | False | Not testable | Unavailable |
+| T3 | Blocked | 660–720, blocked | Unavailable | False | False | Not testable | Unavailable |
+| T4 | Exactly 120 min | 720–840 | Available | True | True | Not testable | Available |
+| T5 | 121 min | 720–841 | Unavailable | False | False | Not testable | Unavailable |
+| T6 | Starts now | 540–570 | Unavailable | False | False | Not testable | Unavailable |
+| T7 | Reversed | 720–660 | Unavailable | False | False | Not testable | Unavailable |
+| T8 | Ends at midnight | 1380–1440 | Available | True | True | Not testable | Not testable |
+| T9 | Past midnight | 1380–1441 | Unavailable | False | False | Not testable | Not testable |
+| T10 | Second booking | 720–780, existing (600–660), (700–760) | Unavailable | False | False | Not testable | Not testable |
+| T11 | Same check twice | 660–720, twice | Available | True | True | Not testable | Available |
+| T12 | Narrow screen | T1 at approximately 375px | Available | n/a | n/a | Not testable | Available |
+The Python results were verified by the supplied checker. The final webpage results for the corresponding Week 06 scenarios were recorded in the earlier lab. The native time input cannot express `24:00`, and some SIS-specific webpage cases were not independently reproduced. These are reported as Not testable rather than invented passes.
 ## 6. Traceability
-
-<!-- His table. Implementation / file: where the rule lives (booking.py line, a component).
-     Test input: the case IDs from section 5. v1 / final actual: what those cases gave. -->
-
 | AC | Implementation / file | Test input | Expected | v1 actual | Final actual |
 | --- | --- | --- | --- | --- | --- |
-| AC1 | (write here) | (write here) | (write here) | (write here) | (write here) |
-| AC2 | (write here) | (write here) | (write here) | (write here) | (write here) |
-| AC3 | (write here) | (write here) | (write here) | (write here) | (write here) |
-| AC4 | (write here) | (write here) | (write here) | (write here) | (write here) |
-| AC5 | (write here) | (write here) | (write here) | (write here) | (write here) |
-| AC6 | (write here) | (write here) | (write here) | (write here) | (write here) |
+| AC1 | `code/booking.py`, time validation | T6, T7, T9 | False | False | False |
+| AC2 | `code/booking.py`, duration validation | T4, T5 | True, False | True, False | True, False |
+| AC3 | `code/booking.py`, blocked check | T3 | False | False | False |
+| AC4 | `code/booking.py`, overlap loop | T1, T2, T10 | True, False, False | True, False, False | True, False, False |
+| AC5 | `code/booking.py`, Boolean result and no mutation | T11 | True | True | True |
+| AC6 | `web/final/src/App.tsx`, result feedback and responsive layout | T12 | Available | Not testable | Available |
+**## 7. Issue log
+#	Issue	Reproduction / AC	Priority	Focused prompt / change	Retest
+1	The original page used system time and different bookings.	T1 and AC1: required now=09:00 and existing booking 10:00–11:00 could not be reproduced in the original export; see evidence/issue-1.jpg.	High	Make the test fixture reproducible using now=09:00 and existing booking 10:00–11:00; keep all booking rules unchanged.	The recorded Week 06 final touching-booking scenario returned Available; other exact SIS cases were not all reproduced.
+2	Native time input cannot represent 24:00.	T8 and AC1: end=1440 is valid in Python but cannot be entered as 24:00 in the page; see evidence/issue-2.jpg.	Medium	Review the native time-input boundary and document the end-of-day limitation without adding backend services or storage.	Still unresolved; T8 and T9 on the page remain Not testable.
 
-## 7. Issue log
 
-<!-- At least two, from v1 — a functional defect and a usability or code-quality issue where you
-     have them. If every case passed on v1, log the preventive cleanup and say why.
-     Reproduction names a case (T1-T12) or an AC. Priority: High, Medium or Low.
-     Prompt / change: the focused prompt you sent, and what changed. Never "make it better". -->
-
-| # | Issue | Reproduction | Priority | Prompt / change | Retest result |
-| --- | --- | --- | --- | --- | --- |
-| 1 | (write here) | (write here) | (write here) | (write here) | (write here) |
-| 2 | (write here) | (write here) | (write here) | (write here) | (write here) |
-
-**Before / after:** `evidence/before-1.png` → `evidence/after-1.png` show issue (write here)
-
-## 8. Critique decisions
-
-<!-- The AI's review against AC1-AC6 (stage C), claim by claim. At least three rows.
-     How I verified it: the case, test or run that confirmed or refuted the claim.
-     Decision: accept, reject or modify. At least one reject or modify — the reflection asks for it. -->
-
-| # | AI claim or recommendation | How I verified it | Decision | Reason (AC or case) |
+Before / after: Issue 1 is shown by evidence/before-1.jpg and evidence/after-1.jpg. The first shows the original test setup; the second shows the recorded final touching-bookings result.
+These screenshots support the comparison but do not replace a missing historical AI conversation.
+8. Critique decisions**
+| # | Claim or recommendation reviewed | How I verified it | Decision | Reason |
 | --- | --- | --- | --- | --- |
-| 1 | (write here) | (write here) | (write here) | (write here) |
-| 2 | (write here) | (write here) | (write here) | (write here) |
-| 3 | (write here) | (write here) | (write here) | (write here) |
-
+| 1 | The Python implementation satisfies AC1–AC5 for contract-valid inputs. | Reviewed every branch and ran the Python test suite. | Accept | The supplied checker and 29 unit tests passed. |
+| 2 | Explicit type guards are necessary for every booking request. | Compared the original and final Python code and checked the stated contract. | Modify | Type guards are useful defensive validation, but non-integer inputs are outside the original contract. |
+| 3 | The final webpage can fully represent every valid Python time boundary. | Reviewed the native time input and the documented 24:00 limitation. | Reject | The Python function allows an end time of 1440, but the webpage cannot enter 24:00. |
+The Week 05 AI review reported no concrete AC1–AC5 violations in the final Python function. I accepted that conclusion for the documented contract, while separately recording the webpage's end-of-day limitation.
 ## 9. Coding-agent analysis
-
 ### 9.1 The loop
-
-<!-- One real pass through the loop from this assignment — with your assistant or with Bolt. -->
-
-| Step | What happened in this assignment |
+| Item | Description |
 | --- | --- |
-| User goal | (write here) |
-| Model / plan | (write here) |
-| Tool call | (write here) |
-| Observation | (write here) |
-| Next step | (write here) |
-| Human review | (write here) |
+| User goal | Improve the room-booking prototype without adding features outside the assignment. |
+| Model / plan | Review the contract, compare original and final code, identify reproducible problems and test required cases. |
+| Tool call | Use Git to recover Week 05 and Week 06 exports, run Python unittest and the SIS checker, and inspect the React project. |
+| Observation | All 29 Python tests passed. The original webpage could not reproduce the fixed-time fixture. The final export differed from the original. |
+| Next step | Preserve evidence, document limitations, complete the report and rerun the checker. |
+| Human review | I checked the acceptance criteria, reviewed test results and kept the original and final sources separate. |
+**### 9.2 Context, tools and permissions
+#	Item	Description	Observed or Assumed
+1	Context	The assistant used the booking contract, acceptance criteria, Python code and earlier lab records.	Observed
+2	Tools	Git, Python unittest, the SIS checker and local project files were used during the review.	Observed
+3	Permissions	Changes should remain inside the SIS-03 branch, without touching external services or production data.	Assumed
 
-### 9.2 Context, tools and permissions
 
-<!-- At least three rows. Last column: Observed (you saw it happen) or Assumed (you infer it
-     about the internals). Use both at least once. -->
-
-| Tool | Context it used | Tools or permissions | Observed or assumed |
-| --- | --- | --- | --- |
-| (write here) | (write here) | (write here) | (write here) |
-| (write here) | (write here) | (write here) | (write here) |
-| (write here) | (write here) | (write here) | (write here) |
-
-### 9.3 Checkpoint and dependability
-
-**Safety checkpoint:** (write here)
-
-**Reliability, security, responsibility:** (write here)
-
+9.3 Checkpoint and dependability**
+**Safety checkpoint:** Before accepting a change, I check whether it stays within the booking requirements, avoids unnecessary features, preserves the original versions and keeps the test suite green. I also review the changed files before committing them to Git.
+**Reliability, security, responsibility:** Automated tests help detect incorrect behavior, but they do not prove that every interface scenario works. I compare results with the acceptance criteria and use screenshots as supporting evidence. I avoid adding unnecessary network access, storage, authentication or dependencies. I also separate actual observations from assumptions. If a historical prompt or test result was not saved, I disclose that instead of creating false evidence.
 ## 10. Reflection
-
-<!-- 100-200 words, in your own words, no AI. Compare AI-assisted coding (the Python part) with
-     vibe coding (the Bolt part); one example each of a reliability, an availability/usability and
-     a security risk; why review, tool permissions and tests stay human responsibilities; one AI
-     recommendation you rejected or modified, and why; what you would improve next without
-     expanding the scope. -->
-
-(write here)
-
+AI-assisted coding and vibe coding helped me in different ways. For Python, I used a clear contract and tested each rule separately. This made it easier to understand why the function accepted or rejected a booking. With Bolt.new, I could get a working webpage faster, but I had less control over the first version and its test conditions.
+One reliability risk was incorrect time validation, especially when a booking starts exactly at the current time. An availability and usability risk was the webpage's inability to enter 24:00. A security risk would be adding unnecessary backend access or storage to a simple checker.
+I learned that AI suggestions still need human review. For example, I did not treat the final webpage as fully supporting every Python boundary because the 24:00 limitation remained. I also checked tool permissions, reviewed changes and ran tests instead of trusting generated code automatically.
+Next time, I would save every prompt, response and screenshot immediately. I would also test the interface against the contract earlier, without adding features outside the assignment.
 ## 11. Appendix A — AI exchanges
-
-<!-- At least four. Complete prompts and complete responses, as text — never screenshots. Paste
-     each inside the ~~~~ block that follows its label.
-     Stage: Plan, Generate, Critique or Repair (the brief's A-D) — at least one of each.
-     Source: this SIS, week-05 or week-06. Reused exchanges keep their original date.
-     The Generate exchange for Python must contain your v1 exactly as it is in code/original/.
-     Add B5, B6 … if you ran more. -->
-
 ### B1
-
-- **Tool:** (write here)
-- **Model:** (write here)
-- **Date:** (write here)
-- **Stage:** (write here)
-- **Source:** (write here)
-
+- **Tool:** ChatGPT Work / Codex desktop
+- **Model:** not displayed
+- **Date:** 2026-10-11
+- **Stage:** Plan
+- **Source:** week-05
 **Prompt:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+Propose a short implementation plan for can_book. List the checks in order and identify assumptions. Use Python 3 and the supplied rules. Do not write code yet. Suggest boundary cases that could expose an incorrect implementation.
+```
 **Response:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+Implementation Plan for can_book()
+1. Checks in Order
+Validate time range (AC1):
+Check 0 <= start < end <= 1440.
+Check start > now.
+Return False if either condition fails.
+Check duration (AC2):
+Calculate end - start.
+Return False if duration exceeds 120 minutes.
+Check room status (AC3):
+Return False if blocked is True.
+Check booking overlaps (AC4):
+Loop through existing bookings.
+Overlap occurs when start < existing_end and end > existing_start.
+Return False if any overlap exists.
+Touching endpoints are allowed.
+Return decision (AC5):
+Return True only if all checks pass.
+Never modify existing or other inputs.
+2. Assumptions
+All times are integer minutes on the same date.
+now is valid (0–1439).
+blocked is a Boolean.
+existing contains only valid, active bookings for the selected room.
+Intervals include the start but exclude the end.
+The function only checks availability; saving and confirmation happen elsewhere.
+3. Boundary Test Cases
+1. start == now: False
+2. start == now + 1 with all other checks passing: True
+3. start == end: False
+4. end == 1440 with all other checks passing: True
+5. Duration = 120 minutes: True
+6. Duration = 121 minutes: False
+7. blocked == True: False
+8. New booking starts exactly when an existing booking ends: True
+9. New booking ends exactly when an existing booking starts: True
+10. New booking overlaps an existing booking by 1 minute: False
+11. existing is empty and all other checks pass: True
+12. start < 0 or end > 1440: False
+Key point: The implementation must reject invalid bookings, allow touching endpoints, and keep all inputs unchanged.
+```
 ### B2
-
-- **Tool:** (write here)
-- **Model:** (write here)
-- **Date:** (write here)
-- **Stage:** (write here)
-- **Source:** (write here)
-
+- **Tool:** ChatGPT Work / Codex desktop
+- **Model:** not displayed
+- **Date:** 2026-10-11
+- **Stage:** Generate
+- **Source:** week-05
 **Prompt:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+Implement can_book in booking.py using the supplied contract and AC1-AC5. Keep the signature. Use only the standard library. Do not modify existing. Return the function and explain each condition. Keep the feature within the stated scope.
+```
 **Response:**
-
-~~~~text
-(paste here)
-~~~~
-
+```python
+def can_book(start, end, now, blocked, existing):
+    # AC1: Validate time range and future start
+    if not (0 <= start < end <= 1440):
+        return False
+    if start <= now:
+        return False
+    # AC2: Maximum booking duration is 120 minutes
+    if end - start > 120:
+        return False
+    # AC3: Room must not be blocked
+    if blocked:
+        return False
+    # AC4: Check for overlapping bookings
+    for existing_start, existing_end in existing:
+        if start < existing_end and end > existing_start:
+            return False
+    # AC5: All conditions are satisfied
+    return True
+```
+Explanation accompanying the generated function:
+```text
+1. AC1 — Valid time: Ensures start and end are within 0–1440, start < end, and start > now.
+2. AC2 — Duration: Rejects bookings longer than 120 minutes. Exactly 120 minutes is allowed.
+3. AC3 — Blocked room: Returns False when the room is blocked.
+4. AC4 — Overlap: Rejects bookings that overlap existing reservations. Touching endpoints are allowed because intervals are [start, end).
+5. AC5 — Final decision: Returns True only when all conditions pass.
+Scope: The function checks one selected room and returns a Boolean. It does not save bookings, generate confirmations, or modify existing.
+This implementation uses no imports or external libraries and stays within the supplied requirements.
+```
 ### B3
-
-- **Tool:** (write here)
-- **Model:** (write here)
-- **Date:** (write here)
-- **Stage:** (write here)
-- **Source:** (write here)
-
+- **Tool:** ChatGPT Work / Codex desktop
+- **Model:** not displayed
+- **Date:** 2026-10-11
+- **Stage:** Critique
+- **Source:** week-05
 **Prompt:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+Review this implementation of can_book against the contract and AC1-AC5 only. List at most five concrete issues. For each one, quote the line and name the acceptance criterion or contract line it concerns. Do not rewrite the function.
+```
+The original Week 05 exchange also included the implementation being reviewed.
 **Response:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+Code Review: can_book()
+Result: PASS — No concrete violations found.
+Contract — Integer times:
+if type(start) is not int or type(end) is not int:
+PASS
+AC1 — Valid time range: PASS
+AC1 — Future start: PASS
+AC2 — Maximum duration: PASS
+AC3 — Room not blocked: PASS
+AC4 — No overlap: PASS
+AC5 — Final decision: PASS
+Contract — Inputs unchanged: PASS
+Findings: 0 concrete issues identified.
+One observation: type guard introduces an explicit policy for non-integer inputs. Contract specifies integer times but does not define behavior for other types. Returning False for non-integer inputs is not a violation.
+Conclusion: implementation satisfies AC1–AC5 for all inputs covered by contract. No changes required.
+Review type: Static code review. No tests executed.
+```
 ### B4
-
-- **Tool:** (write here)
-- **Model:** (write here)
-- **Date:** (write here)
-- **Stage:** (write here)
-- **Source:** (write here)
-
+- **Tool:** ChatGPT / Codex
+- **Model:** not displayed
+- **Date:** 2026-10-16
+- **Stage:** Repair
+- **Source:** week-06
 **Prompt:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+The exact historical repair prompt was not preserved in the available Week 06 records. The recorded repair concerned the booking rule that must reject a start time equal to the current time, together with a TypeScript timeline typing problem.
+```
 **Response:**
-
-~~~~text
-(paste here)
-~~~~
-
+```text
+The complete historical AI response was not preserved.
+The Week 06 report records two changes:
+1. The future-start comparison was corrected from start < currentTime to start <= currentTime.
+2. A timeline typing problem was corrected so the React project could pass its type check.
+The recorded final T6 test rejected a booking starting exactly at now. The final Week 06 test evidence also recorded the remaining scenarios. This is a summary of documented work, not a fabricated verbatim AI response.
+```
 ## 12. Appendix B — Test output
+**### 12.1 Your suite
+The recorded Python unittest run used:
+python3 -m unittest discover -s code -p "test_booking.py" -v
+The following is the recorded 29-test output from the earlier run (the elapsed time is environment-dependent):
+test_121_minutes_is_rejected (test_booking.BookingTests) ... ok
+test_blocked_room_is_rejected (test_booking.BookingTests) ... ok
+test_boolean_end_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
+test_boolean_start_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
+test_empty_existing_is_allowed (test_booking.BookingTests) ... ok
+test_end_after_midnight_is_rejected (test_booking.BookingTests) ... ok
+test_end_at_midnight_is_allowed (test_booking.BookingTests) ... ok
+test_exactly_120_minutes_is_allowed (test_booking.BookingTests) ... ok
+test_existing_unchanged_on_accept (test_booking.BookingTests) ... ok
+test_existing_unchanged_on_reject (test_booking.BookingTests) ... ok
+test_float_end_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
+test_float_start_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
+test_last_minute_of_day_is_allowed (test_booking.BookingTests) ... ok
+test_negative_start_is_rejected (test_booking.BookingTests) ... ok
+test_one_minute_overlap_is_rejected (test_booking.BookingTests) ... ok
+test_overlap_with_later_list_entry_is_rejected (test_booking.BookingTests) ... ok
+test_partial_overlap_is_rejected (test_booking.BookingTests) ... ok
+test_request_contains_existing_is_rejected (test_booking.BookingTests) ... ok
+test_request_inside_existing_is_rejected (test_booking.BookingTests) ... ok
+test_reversed_times_are_rejected (test_booking.BookingTests) ... ok
+test_several_unsorted_nonoverlapping_bookings (test_booking.BookingTests) ... ok
+test_start_before_now_is_rejected (test_booking.BookingTests) ... ok
+test_start_equal_to_now_is_rejected (test_booking.BookingTests) ... ok
+test_start_one_minute_after_now_is_allowed (test_booking.BookingTests) ... ok
+test_string_end_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
+test_string_start_is_rejected_by_declared_policy (test_booking.BookingTests) ... ok
+test_touching_end_is_allowed (test_booking.BookingTests) ... ok
+test_touching_start_is_allowed (test_booking.BookingTests) ... ok
+test_zero_length_is_rejected (test_booking.BookingTests) ... ok
 
-### 12.1 Your suite
+----------------------------------------------------------------------
+Ran 29 tests in 0.000s
 
-<!-- The complete terminal output of your final suite. Path A: python -m unittest -v, run inside
-     code/ — the part ending in "Ran N tests" and OK or FAILED. -->
-
-~~~~text
-(paste here)
-~~~~
-
-### 12.2 Path B only — three faults you planted
-
-<!-- Path A: leave this table as it is. Path B: three rows — the line you broke, the AC it
-     breaks, the test that failed. -->
-
+OK
+All 29 tests passed in the recorded run.
+12.2 Path B only — three faults you planted**
 | # | Line you broke | AC | Test that failed |
 | --- | --- | --- | --- |
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-
+| 1 | Not applicable — Path A | — | — |
+| 2 | Not applicable — Path A | — | — |
+| 3 | Not applicable — Path A | — | — |
 ## 13. Remaining limitations and known fails
-
-<!-- One row per check ID in submission.yml known_fails, and any limitation you know of.
-     If the checker is clean and you know of none, one row that says so. -->
-
 | Check ID or limitation | Why it stays | What I would do next |
 | --- | --- | --- |
-| (write here) | (write here) | (write here) |
+| Original Bolt prompt | The verbatim historical prompt was not preserved. | Save prompts and responses during future development. |
+| Repair exchange transcript | The full historical AI prompt and response were not preserved. | Use the available Week 06 code and test evidence; do not invent the transcript. |
+| 24:00 time input | The webpage cannot express an end time of 1440 using the current native time input. | Add a carefully tested end-of-day input option in a future in-scope revision. |
+| SIS-specific web cases | Some scenarios were not independently reproduced with the exact SIS fixture. | Run and document those scenarios separately. |
+| Original export scope warning | The checker flagged possible backend or database code in the original web export. | Inspect the flagged source while preserving the original export. |
+| Complete verbose test output | Only the verified 29-test summary is included here. | Paste the complete output of the current unittest run. |
