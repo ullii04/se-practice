@@ -79,17 +79,70 @@ five columns.
 `Vitest`, followed by the case table from section 3:
 
 ```text
-(paste here)
+Generate tests for the existing booking function using Vitest. Use AC1–AC6 and the reviewed case table below.
+
+Import the real function used by the page. Keep its code unchanged. Use fixed time and fresh fixtures. Assert exact decisions and unchanged booking data.
+
+Return the test file, run command, and AC mapping. Flag unclear requirements. We will run the tests ourselves.
+
+AC1: accept only 0 <= start < end <= 1440 and start > now. AC2: reject duration >120. AC3: reject blocked rooms. AC4: reject overlaps, allow touching endpoints. AC5: Boolean decision without changing bookings. AC6: usable responsive page and clear validation (manual UI).
+Default fixture now=540, blocked=false, bookings=[{start:600,end:660}]. Each test gets fresh data.
+Reviewed case table (AI-assisted draft, not represented as independently student-authored):
+T01 660-720 true AC4: 660 is excluded from existing 600-660, so they only touch.
+T02 540-570 false AC1: start equals now, not later.
+T03 720-720 false AC1: equal endpoints have no positive duration.
+T04 750-720 false AC1: end is earlier than start.
+T05 1380-1441 false AC1: end exceeds day boundary 1440.
+T06 720-840 true AC2: exactly 120 does not exceed maximum.
+T07 720-841 false AC2: 121 exceeds maximum by one minute.
+T08 570-600 true AC4: request excludes 600, existing begins there.
+T09 630-690 false AC4: shared 630-660 portion overlaps.
+T10 570-690 false AC4: entire existing booking is inside request.
+T11 615-645 false AC4: entire request lies inside existing booking.
+T12 600-660 false AC4: identical intervals share all booked minutes.
+T13 660-720 blocked=true false AC3: blocked overrides otherwise valid request.
+T14 630-690 bookings=[] true AC4: no existing interval conflicts.
+AC5 available request 660-720 true and unchanged data AC5: successful checking must not save or alter bookings.
+X1 1380-1440 true AC1: 1440 is allowed as end, duration 60, future and no overlap.
+X2 720-780 bookings=[{start:600,end:660},{start:700,end:760}] false AC4: second list entry overlaps 720-760 and must be checked.
+
+Existing app/src/booking.ts:
+export interface Booking { start: number; end: number }
+export interface BookingRequest { start: number; end: number; now: number; blocked: boolean; bookings: Booking[]; }
+export function canBook({ start, end, now, blocked, bookings }: BookingRequest): boolean {
+ if (start < 0 || end > 1440) return false;
+ if (start >= end) return false;
+ if (start <= now) return false;
+ if (end - start > 120) return false;
+ if (blocked) return false;
+ if (bookings.some((b) => start < b.end && end > b.start)) return false;
+ return true;
+}
+
+Use one separately named test per case, no test.each. Return the complete file in a TypeScript fenced block, then run command and mapping in plain text. Do not run tests or edit production code.
+
 ```
 
 **The assistant's answer: run command, AC mapping and any unclear requirements it flagged,
 pasted unedited.** Its test file goes to `suites/first/` and is not pasted here:
 
 ```text
-(paste here)
+Run from app/: npx vitest run src/booking.test.ts
+
+AC1: T02–T05, X1.
+AC2: T06–T07.
+AC3: T13.
+AC4: T01, T08–T12, T14, X2.
+AC5: dedicated AC5 test; every test also checks Boolean output and unchanged booking data.
+AC6: manual UI checks required; outside this function suite.
+
+Unclear requirements: behavior for NaN, Infinity, fractional minutes, and malformed existing bookings is unspecified. The reviewed cases also omit an isolated negative-start check and acceptance of start=0 with now<0. The supplied excerpt does not independently establish that the page imports this function.
+
+Tests were not run; production code was not edited.
+
 ```
 
-The first suite was saved to `suites/first/` **before** I changed anything in it: yes / no
+The first suite was saved to `suites/first/` **before** I changed anything in it: yes
 
 ---
 
@@ -102,8 +155,9 @@ requests* · *mocked booking function*, or your own) and the AC that decides it.
 
 | # | Test or part of the suite | What is weak or wrong | Decision: accept / revise / reject | AC or reason |
 | --- | --- | --- | --- | --- |
-| 1 | | | accept / revise / reject | |
-| 2 | | | accept / revise / reject | |
+| 1 | T01–T14, real import and fixture helper | No incorrect expected values, mocked booking function, skipped tests or shared mutable fixture found. | accept | AC1–AC4 expected decisions match the reviewed table, independent of current output. |
+| 2 | expectDecision helper and AC5 test | Exact Boolean assertions and preservation checks are hidden inside a helper; individual cases lack literal assertions. | revise | Make .toBe(true/false) and the Available AC5 before/after comparison explicit in each relevant test. |
+| 3 | Boundary coverage | No isolated negative-start or one-minute-before-now case. | revise | AC1: add tests that reject negative start with now=-10 and reject start=539 at now=540. |
 
 ---
 
