@@ -15,92 +15,101 @@ function fixture(
   };
 }
 
-function expectDecision(request: BookingRequest, expected: boolean): void {
+function expectUnchangedDecision(request: BookingRequest): boolean {
   const before = request.bookings.map((booking) => ({ ...booking }));
 
   const result = canBook(request);
 
-  expect(typeof result).toBe('boolean');
-  expect(result).toBe(expected);
   expect(request.bookings).toStrictEqual(before);
+  return result;
 }
 
 describe('canBook', () => {
   it('T01: accepts a request touching the existing booking end', () => {
-    expectDecision(fixture({ start: 660, end: 720 }), true);
+    expect(expectUnchangedDecision(fixture({ start: 660, end: 720 }))).toBe(true);
   });
 
   it('T02: rejects a start equal to now', () => {
-    expectDecision(fixture({ start: 540, end: 570 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 540, end: 570 }))).toBe(false);
   });
 
   it('T03: rejects equal start and end', () => {
-    expectDecision(fixture({ start: 720, end: 720 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 720, end: 720 }))).toBe(false);
   });
 
   it('T04: rejects an end earlier than the start', () => {
-    expectDecision(fixture({ start: 750, end: 720 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 750, end: 720 }))).toBe(false);
   });
 
   it('T05: rejects an end beyond minute 1440', () => {
-    expectDecision(fixture({ start: 1380, end: 1441 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 1380, end: 1441 }))).toBe(false);
   });
 
   it('T06: accepts a duration of exactly 120 minutes', () => {
-    expectDecision(fixture({ start: 720, end: 840 }), true);
+    expect(expectUnchangedDecision(fixture({ start: 720, end: 840 }))).toBe(true);
   });
 
   it('T07: rejects a duration of 121 minutes', () => {
-    expectDecision(fixture({ start: 720, end: 841 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 720, end: 841 }))).toBe(false);
   });
 
   it('T08: accepts a request touching the existing booking start', () => {
-    expectDecision(fixture({ start: 570, end: 600 }), true);
+    expect(expectUnchangedDecision(fixture({ start: 570, end: 600 }))).toBe(true);
   });
 
   it('T09: rejects a partial overlap', () => {
-    expectDecision(fixture({ start: 630, end: 690 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 630, end: 690 }))).toBe(false);
   });
 
   it('T10: rejects a request containing the existing booking', () => {
-    expectDecision(fixture({ start: 570, end: 690 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 570, end: 690 }))).toBe(false);
   });
 
   it('T11: rejects a request contained in the existing booking', () => {
-    expectDecision(fixture({ start: 615, end: 645 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 615, end: 645 }))).toBe(false);
   });
 
   it('T12: rejects an identical booking interval', () => {
-    expectDecision(fixture({ start: 600, end: 660 }), false);
+    expect(expectUnchangedDecision(fixture({ start: 600, end: 660 }))).toBe(false);
   });
 
   it('T13: rejects an otherwise valid request when the room is blocked', () => {
-    expectDecision(fixture({ start: 660, end: 720, blocked: true }), false);
+    expect(expectUnchangedDecision(fixture({ start: 660, end: 720, blocked: true }))).toBe(false);
   });
 
   it('T14: accepts a request when the bookings list is empty', () => {
-    expectDecision(fixture({ start: 630, end: 690, bookings: [] }), true);
+    expect(expectUnchangedDecision(fixture({ start: 630, end: 690, bookings: [] }))).toBe(true);
   });
 
   it('AC5: returns true without saving or changing booking data', () => {
-    expectDecision(fixture({ start: 660, end: 720 }), true);
+    const request = fixture({ start: 660, end: 720 });
+    const before = request.bookings.map((booking) => ({ ...booking }));
+
+    expect(canBook(request)).toBe(true);
+    expect(request.bookings).toStrictEqual(before);
   });
 
   it('X1: accepts minute 1440 as the end boundary', () => {
-    expectDecision(fixture({ start: 1380, end: 1440 }), true);
+    expect(expectUnchangedDecision(fixture({ start: 1380, end: 1440 }))).toBe(true);
   });
 
   it('X2: rejects an overlap with the second booking in the list', () => {
-    expectDecision(
-      fixture({
+    const request = fixture({
         start: 720,
         end: 780,
         bookings: [
           { start: 600, end: 660 },
           { start: 700, end: 760 },
         ],
-      }),
-      false,
-    );
+    });
+    expect(expectUnchangedDecision(request)).toBe(false);
+  });
+
+  it('N1: rejects a negative start independently of the future rule', () => {
+    expect(expectUnchangedDecision(fixture({ start: -1, end: 30, now: -10, bookings: [] }))).toBe(false);
+  });
+
+  it('N2: rejects a start before now without booking conflicts', () => {
+    expect(expectUnchangedDecision(fixture({ start: 539, end: 570, now: 540, bookings: [] }))).toBe(false);
   });
 });
