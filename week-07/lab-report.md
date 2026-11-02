@@ -13,13 +13,13 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 | | |
 | --- | --- |
-| Project I continue (`week-06` = my Week 06 Bolt project, `starter` = the provided starter) | |
-| Bolt project link (or `not shared`, and why) | |
-| Assistant that generated the tests (tool) | |
-| Exact model (with its version, or `not displayed`) | |
-| Where I ran the tests (Bolt terminal / my computer / Codespace) | |
-| Vitest version (the `RUN  v…` line of a run) | |
-| Test command | |
+| Project I continue (`week-06` = my Week 06 Bolt project, `starter` = the provided starter) | week-06 |
+| Bolt project link (or `not shared`, and why) | https://bolt.new/~/sb1-g3bmtzgh |
+| Assistant that generated the tests (tool) | ChatGPT / Codex, fresh isolated assistant context |
+| Exact model (with its version, or `not displayed`) | not displayed |
+| Where I ran the tests (Bolt terminal / my computer / Codespace) | my computer, Node 24.13.1 |
+| Vitest version (the `RUN  v…` line of a run) | 3.2.4 |
+| Test command | npm test -- --reporter=verbose  660 is excluded from existing 600–660, so the intervals only touch. |
 
 ---
 
@@ -29,15 +29,16 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 | | |
 | --- | --- |
-| File and function (or "inside the page component") | |
-| Its inputs | |
-| What it returned | |
-| How the page used it | |
+| File and function (or "inside the page component") | app/src/lib/validation.ts: checkAvailability |
+| Its inputs | room, start, end, currentTime in numeric minutes |
+| What it returned | object with Boolean available and optional reason |
+| How the page used it | App.tsx handleCheck called it and stored the result for ResultBanner |
 
 **What I changed to extract `canBook`.** Say which file it now lives in, what you moved, and why
 the behaviour did not change. Also say which file of the page now calls it. 40 words or more.
 
 <!-- Write below this line -->
+The baseline is an unchanged copy of week-06:week-06/prototype/project from the local Week 06 branch, flattened into app/ so package.json is directly in app/. Baseline commit 8792ee2 precedes extraction. The Boolean guards were moved in the same order to app/src/booking.ts, keeping the comparisons unchanged. App.tsx calls canBook directly; HH:MM parsing and human-readable rejection reasons remain at the interface boundary. Existing numerical behavior is preserved, including the unspecified reversed-existing-booking case. All report prose and case reasons in this revision are AI-assisted drafts, disclosed rather than claimed as independent student writing.
 
 ---
 
@@ -49,23 +50,23 @@ for every test. **The Expected column comes from AC1–AC4, never from the code.
 
 | ID | Candidate / changed input | Expected | AC | Reason (in your words) |
 | --- | --- | --- | --- | --- |
-| T01 | 660–720 (touching after) | true | AC4 | |
-| T02 | 540–570 (starts now) | false | AC1 | |
-| T03 | 720–720 (zero duration) | false | AC1 | |
-| T04 | 750–720 (reversed) | false | AC1 | |
-| T05 | 1380–1441 (past day end) | false | AC1 | |
-| T06 | 720–840 (120 minutes) | true | AC2 | |
-| T07 | 720–841 (121 minutes) | false | AC2 | |
-| T08 | 570–600 (touching before) | true | AC4 | |
-| T09 | 630–690 (partial overlap) | false | AC4 | |
-| T10 | 570–690 (contains booking) | false | AC4 | |
-| T11 | 615–645 (inside booking) | false | AC4 | |
-| T12 | 600–660 (identical interval) | false | AC4 | |
-| T13 | 660–720, blocked = true | false | AC3 | |
-| T14 | 630–690, bookings = [] | true | AC4 | |
+| T01 | 660–720 (touching after) | true | AC4 |  540 equals now rather than being strictly later. |
+| T02 | 540–570 (starts now) | false | AC1 |  Equal endpoints have no positive duration. |
+| T03 | 720–720 (zero duration) | false | AC1 |  The end is earlier than the start. |
+| T04 | 750–720 (reversed) | false | AC1 |  1441 is one minute beyond the allowed day end. |
+| T05 | 1380–1441 (past day end) | false | AC1 |  The duration is exactly 120, which does not exceed the maximum. |
+| T06 | 720–840 (120 minutes) | true | AC2 |  121 minutes exceeds the maximum by one minute. |
+| T07 | 720–841 (121 minutes) | false | AC2 |  The request excludes 600, where the existing interval begins. |
+| T08 | 570–600 (touching before) | true | AC4 |  The shared 630–660 portion conflicts with an existing booking. |
+| T09 | 630–690 (partial overlap) | false | AC4 |  The request contains the whole existing 600–660 interval. |
+| T10 | 570–690 (contains booking) | false | AC4 |  The whole request lies inside the existing booking. |
+| T11 | 615–645 (inside booking) | false | AC4 |  Identical intervals share all booked minutes. |
+| T12 | 600–660 (identical interval) | false | AC4 |  Blocked status overrides an otherwise valid request. |
+| T13 | 660–720, blocked = true | false | AC3 |  No existing interval remains to conflict with this request. |
+| T14 | 630–690, bookings = [] | true | AC4 |  A successful check must not save or alter an existing booking. |
 | AC5 | an Available request — the bookings after the call equal the bookings before | true, data unchanged | AC5 | |
-| X1 | | | | |
-| X2 | | | | |
+| X1 | 1380–1440 | true | AC1 | 1440 is allowed as an end, with a future 60-minute request and no conflict. |
+| X2 | 720–780, bookings = [{start:600,end:660},{start:700,end:760}] | false | AC4 | The second entry overlaps 720–760 and must be checked too. |
 
 X1 and X2 are **your own two cases**: a boundary or a state that T01–T14 do not reach. Fill all
 five columns.

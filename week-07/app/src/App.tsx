@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Clock, CheckCircle2 } from 'lucide-react';
 import { rooms as sampleRooms } from '@/lib/sampleData';
 import { checkAvailability } from '@/lib/validation';
+import { canBook } from './booking';
 import { minutesToLabel, CURRENT_TIME } from '@/lib/format';
 import type { AvailabilityResult } from '@/lib/types';
 import RoomList from '@/components/RoomList';
@@ -40,7 +41,9 @@ function App() {
       setResult({ available: false, reason: 'Please enter valid times in HH:MM format.' });
       return;
     }
-    setResult(checkAvailability(selectedRoom, s, e, CURRENT_TIME));
+    const available = canBook({ start: s, end: e, now: CURRENT_TIME,
+      blocked: selectedRoom.blocked, bookings: selectedRoom.bookings });
+    setResult(available ? { available: true } : checkAvailability(selectedRoom, s, e, CURRENT_TIME));
   }
 
   function handleReset() {

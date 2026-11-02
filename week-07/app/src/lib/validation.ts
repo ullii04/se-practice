@@ -1,3 +1,4 @@
+import { canBook } from '../booking';
 import type { Room, AvailabilityResult } from './types';
 
 export function checkAvailability(
@@ -6,6 +7,9 @@ export function checkAvailability(
   end: number,
   currentTime: number
 ): AvailabilityResult {
+  if (canBook({ start, end, now: currentTime, blocked: room.blocked, bookings: room.bookings })) {
+    return { available: true };
+  }
   if (start < 0 || end > 1440) {
     return { available: false, reason: 'Time must be between 00:00 and 24:00.' };
   }
@@ -25,5 +29,5 @@ export function checkAvailability(
   if (overlap) {
     return { available: false, reason: 'The selected time overlaps an existing booking.' };
   }
-  return { available: true };
+  return { available: false, reason: 'The selected time is unavailable.' };
 }
