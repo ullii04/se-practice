@@ -1,0 +1,60 @@
+
+> vite-react-typescript-starter@0.0.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+
+ ✓ src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end 1ms
+ ✓ src/booking.test.ts > canBook > T02: rejects a start equal to now 0ms
+ ✓ src/booking.test.ts > canBook > T03: rejects equal start and end 0ms
+ ✓ src/booking.test.ts > canBook > T04: rejects an end earlier than the start 0ms
+ ✓ src/booking.test.ts > canBook > T05: rejects an end beyond minute 1440 0ms
+ × src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes 2ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > canBook > T07: rejects a duration of 121 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start 0ms
+ ✓ src/booking.test.ts > canBook > T09: rejects a partial overlap 0ms
+ ✓ src/booking.test.ts > canBook > T10: rejects a request containing the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T11: rejects a request contained in the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T12: rejects an identical booking interval 0ms
+ ✓ src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked 0ms
+ ✓ src/booking.test.ts > canBook > T14: accepts a request when the bookings list is empty 0ms
+ ✓ src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data 0ms
+ ✓ src/booking.test.ts > canBook > X1: accepts minute 1440 as the end boundary 0ms
+ ✓ src/booking.test.ts > canBook > X2: rejects an overlap with the second booking in the list 0ms
+ ✓ src/booking.test.ts > canBook > N1: rejects a negative start independently of the future rule 0ms
+ ✓ src/booking.test.ts > canBook > N2: rejects a start before now without booking conflicts 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:49:72
+     47| 
+     48|   it('T06: accepts a duration of exactly 120 minutes', () => {
+     49|     expect(expectUnchangedDecision(fixture({ start: 720, end: 840 })))…
+       |                                                                        ^
+     50|   });
+     51| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+   Start at  03:33:48
+   Duration  254ms (transform 16ms, setup 0ms, collect 15ms, tests 5ms, environment 0ms, prepare 31ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice

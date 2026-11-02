@@ -38,7 +38,7 @@ grader find your answers by them. You can add rows to any table, but never remov
 the behaviour did not change. Also say which file of the page now calls it. 40 words or more.
 
 <!-- Write below this line -->
-The baseline is an unchanged copy of week-06:week-06/prototype/project from the local Week 06 branch, flattened into app/ so package.json is directly in app/. Baseline commit 8792ee2 precedes extraction. The Boolean guards were moved in the same order to app/src/booking.ts, keeping the comparisons unchanged. App.tsx calls canBook directly; HH:MM parsing and human-readable rejection reasons remain at the interface boundary. Existing numerical behavior is preserved, including the unspecified reversed-existing-booking case. All report prose and case reasons in this revision are AI-assisted drafts, disclosed rather than claimed as independent student writing.
+The baseline is an unchanged copy of week-06:week-06/prototype/project from the local Week 06 branch, flattened into app/ so package.json is directly in app/. Baseline commit 5977d95 precedes extraction. The Boolean guards were moved in the same order to app/src/booking.ts, keeping the comparisons unchanged. App.tsx calls canBook directly; HH:MM parsing and human-readable rejection reasons remain at the interface boundary. Existing numerical behavior is preserved, including the unspecified reversed-existing-booking case. All report prose and case reasons in this revision are AI-assisted drafts, disclosed rather than claimed as independent student writing.
 
 ---
 
@@ -165,120 +165,428 @@ requests* · *mocked booking function*, or your own) and the AC that decides it.
 
 ### 6.1 The first run
 
-The **real** terminal output of the first run of the first suite, pasted unedited. Include the
-`RUN  v…` line and the `Tests` summary line. A build message or the assistant saying "tests pass"
-is not a run.
-
+The untouched first suite was run after its review. No test failed.
 ```text
-(paste here)
-```
 
-**Each failure, diagnosed** (the deck's table: import/runner error · assertion mismatch · result
-changing per run · no tests discovered). Write `none` in the first row if nothing failed.
+> vite-react-typescript-starter@0.0.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+
+ ✓ src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end 1ms
+ ✓ src/booking.test.ts > canBook > T02: rejects a start equal to now 0ms
+ ✓ src/booking.test.ts > canBook > T03: rejects equal start and end 0ms
+ ✓ src/booking.test.ts > canBook > T04: rejects an end earlier than the start 0ms
+ ✓ src/booking.test.ts > canBook > T05: rejects an end beyond minute 1440 0ms
+ ✓ src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T07: rejects a duration of 121 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start 0ms
+ ✓ src/booking.test.ts > canBook > T09: rejects a partial overlap 0ms
+ ✓ src/booking.test.ts > canBook > T10: rejects a request containing the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T11: rejects a request contained in the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T12: rejects an identical booking interval 0ms
+ ✓ src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked 0ms
+ ✓ src/booking.test.ts > canBook > T14: accepts a request when the bookings list is empty 0ms
+ ✓ src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data 0ms
+ ✓ src/booking.test.ts > canBook > X1: accepts minute 1440 as the end boundary 0ms
+ ✓ src/booking.test.ts > canBook > X2: rejects an overlap with the second booking in the list 0ms
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  03:29:40
+   Duration  283ms (transform 16ms, setup 0ms, collect 14ms, tests 2ms, environment 0ms, prepare 29ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+```
 
 | Failing test | Observed failure | First check | Test repair or implementation fix? | Action taken |
 | --- | --- | --- | --- | --- |
-| | | | | |
+| none | 17 passed; no assertion failures | Inputs, expected values and import reviewed against AC1–AC5 | No implementation fix | Improve assertion visibility and add two missing independent AC1 boundaries. |
+
+Environment setup note: the first npm installation attempt could not write the protected home cache. Retrying with a temporary cache succeeded. This was dependency setup, not a failing test or a code defect.
 
 ### 6.2 The improvement prompt
 
-The deck's improvement prompt exactly as sent, followed by the actual output from 6.1. Then
-paste the assistant's answer, unedited:
-
+Prompt as sent (the inline output is explicitly a summary excerpt; the complete untouched run is in 6.1):
 ```text
-(paste here)
+Review this test suite against AC1–AC6 and our case table. Identify incorrect expectations, weak assertions, duplicated cases, and missing boundaries.
+
+For each proposed change, explain the requirement and the defect it could detect. Improve the tests without changing correct expectations to match buggy behavior.
+
+Use the actual failure output below. Separate test repairs from implementation fixes.
+
+Actual first run (summary excerpt; no failures):
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+Full unedited output: /private/tmp/week07-first-run.txt
+
+The current test suite is your preserved generated suite at /Users/elshibaiulzhalgas/se-practice/week-07/suites/first/booking.test.ts. The reviewed case table is in lab-report.md section 3. Review decisions made before first run: accept correct plan decisions and real import; revise exact .toBe(expected) helper into explicit .toBe(true/false) inside each T test, put explicit before/after booking comparison inside the Available AC5 test; add isolated AC1 negative-start and start-before-now tests.
+
+Make these improvements in /Users/elshibaiulzhalgas/se-practice/week-07/app/src/booking.test.ts ONLY. Keep first suite unchanged and production booking.ts unchanged. Use 19 separately named tests total: T01-T14, AC5, X1, X2, N1 negative start -1 to30 now=-10 with empty bookings (false from lower day bound), N2 start539 end570 now540 with empty bookings (false from future rule). Fresh fixtures, exact assertions. Save this exact received prompt as work/week07-improvement-prompt.txt and your complete review response as work/week07-improvement-answer.txt under /Users/elshibaiulzhalgas/Documents/Codex/2026-10-24/referenced-chatgpt-conversation-this-is-an/. Do not run tests. Return requirement/defect rationale and what did/did not change.
 ```
+Assistant response, unedited:
+```text
+Updated only the active test suite to 19 separately named tests. The original run output records 17 passing tests and no failures; there is no failure-driven implementation fix to make. I did not run the revised tests.
+
+Review and test improvements:
+- All original expected decisions are correct under AC1–AC4. The real import, fixed now values, and fresh fixtures remain.
+- Each case now contains an explicit .toBe(true) or .toBe(false). The previous .toBe(expected) was already exact, so this is a visibility improvement rather than a repair of a weak truthiness assertion. Exact Boolean assertions detect returning 1, 0, strings, or undefined.
+- The Available AC5 test now visibly snapshots booking values before calling canBook and compares them afterward. This detects insertion, deletion, reordering, or changed booking fields. Booking comparisons remain in the other cases through a helper.
+- N1 (-1–30, now=-10, empty bookings) enforces AC1's lower day boundary independently of the future rule. It detects a missing negative-start guard.
+- N2 (539–570, now=540, empty bookings) enforces AC1's strictly future start independently of overlap. It detects accepting past starts, such as checking equality alone.
+- T01 and AC5 share the same available request deliberately: T01 exercises touching endpoints, while AC5 makes non-mutation explicit. Neither was removed.
+- Existing boundary and state coverage remains: starts-now T02; equal/reversed endpoints T03–T04; end 1441/1440 T05/X1; duration 120/121 T06–T07; touching endpoints T01/T08; overlap forms T09–T12; blocked room T13; empty bookings T14; second booking conflict X2.
+
+The section 3 table's Expected and AC columns match the original tests, but its Reason cells are shifted: T01 contains T02's reason, continuing through T14 containing AC5's reason, with AC5 blank. This is a report defect, not a reason to change test expectations. The table was left unchanged as requested.
+
+Remaining coverage limits: accepting start=0 would require now<0 and remains untested within the specified 19 cases. Non-finite/fractional inputs and malformed existing bookings lack explicit requirements. AC6 remains a manual responsive-page and validation check; this function suite cannot establish it.
+
+Implementation fixes: none. Production booking.ts and the preserved first suite were left unchanged. Only app/src/booking.test.ts was improved; the requested prompt and review response were saved in work/.
+```
+The reported shifted Reason cells were corrected using the pre-generation rationale from the prompt; no Expected values were changed.
 
 ### 6.3 The final run
 
-The **real** output of the final suite (`booking.test.*` beside your module), after every
-change and after restoring the correct code from section 7. Every test must pass. If a real defect
-is still open, leave its test failing and explain it in 9.1.
-
+After restoring all three mutants, the complete final suite was run again:
 ```text
-(paste here)
-```
 
----
+> vite-react-typescript-starter@0.0.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+
+ ✓ src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end 1ms
+ ✓ src/booking.test.ts > canBook > T02: rejects a start equal to now 0ms
+ ✓ src/booking.test.ts > canBook > T03: rejects equal start and end 0ms
+ ✓ src/booking.test.ts > canBook > T04: rejects an end earlier than the start 0ms
+ ✓ src/booking.test.ts > canBook > T05: rejects an end beyond minute 1440 0ms
+ ✓ src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T07: rejects a duration of 121 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start 0ms
+ ✓ src/booking.test.ts > canBook > T09: rejects a partial overlap 0ms
+ ✓ src/booking.test.ts > canBook > T10: rejects a request containing the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T11: rejects a request contained in the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T12: rejects an identical booking interval 0ms
+ ✓ src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked 0ms
+ ✓ src/booking.test.ts > canBook > T14: accepts a request when the bookings list is empty 0ms
+ ✓ src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data 0ms
+ ✓ src/booking.test.ts > canBook > X1: accepts minute 1440 as the end boundary 0ms
+ ✓ src/booking.test.ts > canBook > X2: rejects an overlap with the second booking in the list 0ms
+ ✓ src/booking.test.ts > canBook > N1: rejects a negative start independently of the future rule 0ms
+ ✓ src/booking.test.ts > canBook > N2: rejects a start before now without booking conflicts 0ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  03:39:07
+   Duration  282ms (transform 20ms, setup 0ms, collect 15ms, tests 2ms, environment 0ms, prepare 33ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+```
+TypeScript checking and the production build also passed. The build reports an outdated Browserslist database warning; this does not affect the observed unit-test outcomes.
 
 ## 7. Task 6 — deliberate defects
 
-You need a reviewed, passing suite first. Then introduce **one** defect at a time in your booking
-module, leave the tests unchanged, run, record, and **restore** the code. A syntax or import
-error does not count as detection.
+Tests were unchanged across all mutant runs. Each trial began from the correct source; the source was restored immediately after the run and in a finally block.
 
 | Trial | Intentional change | Detected / Survived | Failing test ID(s) | If it survived: why, and what you added |
 | --- | --- | --- | --- | --- |
-| M1 | Reject duration >= 120 instead of > 120 | Detected / Survived | | |
-| M2 | Treat touching endpoints as an overlap | Detected / Survived | | |
-| M3 | Remove the blocked-room rejection | Detected / Survived | | |
+| M1 | Reject duration >= 120 instead of > 120 | Detected | T06 | Not applicable; assertion failure, no survivor. |
+| M2 | Treat touching endpoints as an overlap | Detected | T01, T08, AC5 | Not applicable; assertion failures, no survivor. |
+| M3 | Remove the blocked-room rejection | Detected | T13 | Not applicable; assertion failure, no survivor. |
 
-**The run of each mutant, pasted unedited.** Paste the `Tests` summary line and the failing test
-names at least:
-
+**M1**
 ```text
-(paste here)
+
+> vite-react-typescript-starter@0.0.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+
+ ✓ src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end 1ms
+ ✓ src/booking.test.ts > canBook > T02: rejects a start equal to now 0ms
+ ✓ src/booking.test.ts > canBook > T03: rejects equal start and end 0ms
+ ✓ src/booking.test.ts > canBook > T04: rejects an end earlier than the start 0ms
+ ✓ src/booking.test.ts > canBook > T05: rejects an end beyond minute 1440 0ms
+ × src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes 2ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > canBook > T07: rejects a duration of 121 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start 0ms
+ ✓ src/booking.test.ts > canBook > T09: rejects a partial overlap 0ms
+ ✓ src/booking.test.ts > canBook > T10: rejects a request containing the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T11: rejects a request contained in the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T12: rejects an identical booking interval 0ms
+ ✓ src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked 0ms
+ ✓ src/booking.test.ts > canBook > T14: accepts a request when the bookings list is empty 0ms
+ ✓ src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data 0ms
+ ✓ src/booking.test.ts > canBook > X1: accepts minute 1440 as the end boundary 0ms
+ ✓ src/booking.test.ts > canBook > X2: rejects an overlap with the second booking in the list 0ms
+ ✓ src/booking.test.ts > canBook > N1: rejects a negative start independently of the future rule 0ms
+ ✓ src/booking.test.ts > canBook > N2: rejects a start before now without booking conflicts 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:49:72
+     47| 
+     48|   it('T06: accepts a duration of exactly 120 minutes', () => {
+     49|     expect(expectUnchangedDecision(fixture({ start: 720, end: 840 })))…
+       |                                                                        ^
+     50|   });
+     51| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+   Start at  03:33:48
+   Duration  254ms (transform 16ms, setup 0ms, collect 15ms, tests 5ms, environment 0ms, prepare 31ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
 ```
 
-All three changes reverted, and the full suite run again (section 6.3): yes / no
+**M2**
+```text
 
----
+> vite-react-typescript-starter@0.0.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+
+ × src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end 3ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > canBook > T02: rejects a start equal to now 0ms
+ ✓ src/booking.test.ts > canBook > T03: rejects equal start and end 0ms
+ ✓ src/booking.test.ts > canBook > T04: rejects an end earlier than the start 0ms
+ ✓ src/booking.test.ts > canBook > T05: rejects an end beyond minute 1440 0ms
+ ✓ src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T07: rejects a duration of 121 minutes 0ms
+ × src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start 0ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > canBook > T09: rejects a partial overlap 0ms
+ ✓ src/booking.test.ts > canBook > T10: rejects a request containing the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T11: rejects a request contained in the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T12: rejects an identical booking interval 0ms
+ ✓ src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked 0ms
+ ✓ src/booking.test.ts > canBook > T14: accepts a request when the bookings list is empty 0ms
+ × src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data 0ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > canBook > X1: accepts minute 1440 as the end boundary 0ms
+ ✓ src/booking.test.ts > canBook > X2: rejects an overlap with the second booking in the list 0ms
+ ✓ src/booking.test.ts > canBook > N1: rejects a negative start independently of the future rule 0ms
+ ✓ src/booking.test.ts > canBook > N2: rejects a start before now without booking conflicts 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:29:72
+     27| describe('canBook', () => {
+     28|   it('T01: accepts a request touching the existing booking end', () =>…
+     29|     expect(expectUnchangedDecision(fixture({ start: 660, end: 720 })))…
+       |                                                                        ^
+     30|   });
+     31| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:57:72
+     55| 
+     56|   it('T08: accepts a request touching the existing booking start', () …
+     57|     expect(expectUnchangedDecision(fixture({ start: 570, end: 600 })))…
+       |                                                                        ^
+     58|   });
+     59| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:88:30
+     86|     const before = request.bookings.map((booking) => ({ ...booking }));
+     87| 
+     88|     expect(canBook(request)).toBe(true);
+       |                              ^
+     89|     expect(request.bookings).toStrictEqual(before);
+     90|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 16 passed (19)
+   Start at  03:33:49
+   Duration  175ms (transform 15ms, setup 0ms, collect 14ms, tests 5ms, environment 0ms, prepare 39ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+```
+
+**M3**
+```text
+
+> vite-react-typescript-starter@0.0.0 test
+> vitest run --reporter=verbose
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/se-practice/week-07/app
+
+ ✓ src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end 1ms
+ ✓ src/booking.test.ts > canBook > T02: rejects a start equal to now 0ms
+ ✓ src/booking.test.ts > canBook > T03: rejects equal start and end 0ms
+ ✓ src/booking.test.ts > canBook > T04: rejects an end earlier than the start 0ms
+ ✓ src/booking.test.ts > canBook > T05: rejects an end beyond minute 1440 0ms
+ ✓ src/booking.test.ts > canBook > T06: accepts a duration of exactly 120 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T07: rejects a duration of 121 minutes 0ms
+ ✓ src/booking.test.ts > canBook > T08: accepts a request touching the existing booking start 0ms
+ ✓ src/booking.test.ts > canBook > T09: rejects a partial overlap 0ms
+ ✓ src/booking.test.ts > canBook > T10: rejects a request containing the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T11: rejects a request contained in the existing booking 0ms
+ ✓ src/booking.test.ts > canBook > T12: rejects an identical booking interval 0ms
+ × src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked 2ms
+   → expected true to be false // Object.is equality
+ ✓ src/booking.test.ts > canBook > T14: accepts a request when the bookings list is empty 0ms
+ ✓ src/booking.test.ts > canBook > AC5: returns true without saving or changing booking data 0ms
+ ✓ src/booking.test.ts > canBook > X1: accepts minute 1440 as the end boundary 0ms
+ ✓ src/booking.test.ts > canBook > X2: rejects an overlap with the second booking in the list 0ms
+ ✓ src/booking.test.ts > canBook > N1: rejects a negative start independently of the future rule 0ms
+ ✓ src/booking.test.ts > canBook > N2: rejects a start before now without booking conflicts 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > canBook > T13: rejects an otherwise valid request when the room is blocked
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/booking.test.ts:77:87
+     75| 
+     76|   it('T13: rejects an otherwise valid request when the room is blocked…
+     77|     expect(expectUnchangedDecision(fixture({ start: 660, end: 720, blo…
+       |                                                                                       ^
+     78|   });
+     79| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+   Start at  03:33:49
+   Duration  182ms (transform 14ms, setup 0ms, collect 13ms, tests 4ms, environment 0ms, prepare 23ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.1
+npm notice To update run: npm install -g npm@11.21.1
+npm notice
+```
+
+All three changes reverted, and the full suite run again (section 6.3): yes
+
+The preserved first suite was subsequently tried separately against the same three mutants: all three were detected by assertion failures. Full outputs are saved in evidence/first-M1-run.txt, first-M2-run.txt and first-M3-run.txt. Its test file remains unchanged. The final suite and correct module were restored and rerun afterward.
 
 ## 8. Task 7 — manual UI checks
 
-Use `now = 09:00` and an existing `10:00–11:00` booking. Do them in the page in a browser. Save a
-screenshot of each as `evidence/ui-1.png` … `evidence/ui-5.png`. Take **ui-4 at phone width**
-(about 375 px, portrait).
+These checks were performed by the assistant through real browser controls on the local page, with now=09:00 and the original 10:00–11:00 sample booking. They are not claimed as student-performed manual checks.
 
 | # | Action | Expected observation | AC | What I observed | Pass / Fail / Not testable |
 | --- | --- | --- | --- | --- | --- |
-| U1 | Check 11:00–12:00, unblocked | Available, with the fixed sample booking | AC5 | | Pass / Fail / Not testable |
-| U2 | Enable blocked, then check again | Unavailable replaces the earlier result | AC3, AC5 | | Pass / Fail / Not testable |
-| U3 | Clear a required input and submit | Understandable validation feedback | AC6 | | Pass / Fail / Not testable |
-| U4 | Use a narrow (phone) width | Controls and result remain usable | AC6 | | Pass / Fail / Not testable |
-| U5 | Repeat the checks on the same data | Existing bookings remain unchanged | AC5 | | Pass / Fail / Not testable |
+| U1 | Check 11:00–12:00, unblocked | Available, with the fixed sample booking | AC5 | Available and the existing 10:00–11:00 booking remained visible. | Pass |
+| U2 | Enable blocked, then check again | Unavailable replaces the earlier result | AC3, AC5 | The previous Available result was replaced by Unavailable with a blocked-room explanation. | Pass |
+| U3 | Clear required inputs and submit | Understandable validation feedback | AC6 | Reset cleared inputs; Check showed Unavailable and Please enter valid times in HH:MM format. | Pass |
+| U4 | Use a narrow phone width | Controls and result remain usable | AC6 | At measured innerWidth=375, inputs, Check, Reset and result were visible after scrolling, without horizontal overflow. | Pass |
+| U5 | Repeat checks on the same data | Existing bookings remain unchanged | AC5 | Checked 12:00–13:00 twice; Available remained and all three original booking labels were unchanged. | Pass |
 
----
+Evidence ui-1.jpg through ui-5.jpg is unedited browser capture. The browser tool's full-page capture had scaling/clipping artifacts at narrow width, so ui-4 uses a native viewport capture after scrolling to the controls and result. A viewport override of 450 produced measured CSS innerWidth=375 because of browser zoom. The page's scrollWidth also measured 375 and every control's right edge was within that width. No visual layout fix was needed. The browser override was reset afterward.
 
 ## 9. Comparison and what still fails
 
 ### 9.1 Checks I am keeping as FAIL or ERROR
 
-Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run is clean.
-
 | Check | Why it stays |
 | --- | --- |
-| | |
+| none | No checker FAIL or ERROR remains after final validation. |
+
+Authorship limitation: case rationales, X1/X2 and review/comparison prose were AI-assisted rather than independently authored by the student. They are disclosed in AI_USAGE.md and require student review. Section 10 translates and organizes the student’s own reflections supplied in chat; technical wording clarifies that the automated tests run in Node, and that rejecting equality is the planted defect. Passing the shape checker does not establish personal understanding.
 
 ### 9.2 Original and improved suites
 
 | Measure | First suite | Improved suite |
 | --- | --- | --- |
-| Executed / passed / failed | | |
-| Requirements with meaningful tests (AC IDs and gaps) | | |
-| Selected mutants detected | | |
-| Accepted / revised / rejected tests | | |
-| Remaining limitations | | |
+| Executed / passed / failed | 17 / 17 / 0 | 19 / 19 / 0 after mutant restoration |
+| Requirements with meaningful tests (AC IDs and gaps) | AC1–AC5; AC6 needs browser checks; missing independent negative-start and past-start cases | AC1–AC5 plus N1/N2 independent boundaries; AC6 checked separately in browser |
+| Selected mutants detected | M1, M2, M3: 3/3 detected in separate first-suite trials; raw outputs in evidence/first-M1-run.txt through first-M3-run.txt | M1, M2, M3: 3/3 detected by assertion failures |
+| Accepted / revised / rejected tests | Correct expectations and real import accepted; helper visibility and missing boundaries revised; none rejected as incorrect | All 17 original expected results retained; assertions made explicit; two tests added |
+| Remaining limitations | Helper hides literal decisions from a simple reader; limited boundaries and malformed-input policy | No proof for every input or browser; finite/fractional types unspecified; reversed existing bookings not validated |
+
+The comparison concerns these specific suites and trials, not a claim that either suite proves universal correctness.
 
 ### 9.3 What no AC decides
 
-Call your function with `bookings = [{ start: 700, end: 650 }]` (a reversed existing booking)
-and a request of 660–720. What does it return? Does any AC say what it should return? (This is
-the value you declare in `submission.yml` under `assumptions.invalid_existing_booking`.)
+A real direct call returned true for start=660, end=720, now=540, blocked=false and bookings=[{start:700,end:650}]. The overlap condition is false because 660 < 650 is false. The function therefore accepts the request. This behavior was inherited unchanged from Week 06; it was not deliberately added during extraction. AC1 validates the candidate interval; no AC specifies the policy for an invalid existing interval. The declaration uses returns-true. A future contract should explicitly choose whether malformed stored intervals are rejected, ignored or treated as errors.
 
--
-
----
+This analysis is AI-assisted and should be reviewed by the student before defending it.
 
 ## 10. Conclusion (120–180 words)
 
-<!-- Answer all three in your own words, without the assistant:
-     (a) Which mistake in the FIRST suite would have let a wrong canBook pass, and how did you find it?
-     (b) What does your final green run prove, and what does it NOT prove? Use a mutant or a UI check.
-     (c) One testing limitation that remains.
-     Worthless: "The AI wrote good tests and they all passed."
-     Worth everything: "The first suite expected T06 (exactly 120 minutes) to be rejected. That
-     contradicts AC2, and it failed on a correct canBook. If I had changed the code to make it
-     pass, M1 would have become the real behaviour." -->
+A green run only shows that the cases checked did not fail; it cannot prove that unchecked situations are correct. The first suite had no incorrect expected values, but its helper hid the individual decisions. That made review harder: a reader had to look elsewhere for each expectation, and a later helper change could affect many tests. Explicit assertions make the scenarios easier to audit.
 
-<!-- Write your conclusion below this line -->
+T06 detected the deliberate change that rejected exactly 120 minutes. AC2 rejects bookings longer than 120 minutes, so equality must remain valid. Ordinary requests could pass despite that comparison mistake; a boundary case exposed it.
+
+The restored final run passed nineteen unit tests. These tests support the selected rules and data-preservation checks, but do not prove all browser layouts or invalid-input behavior. Browser engines, versions and resolutions vary, while malformed inputs have many possible forms. Representative samples and the five observed UI checks provide useful evidence, not exhaustive proof.
