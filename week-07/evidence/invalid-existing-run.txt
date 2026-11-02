@@ -1,0 +1,1 @@
+{"request":{"start":660,"end":720,"now":540,"blocked":false,"bookings":[{"start":700,"end":650}]},"result":true}
