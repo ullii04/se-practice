@@ -979,10 +979,42 @@ The targeted BUG-A assertion now passes. The full suite still has seven mutation
 The change as a diff, then the real output of the **full** suite. Every test must pass.
 
 ```text
-(paste here)
+diff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts
+index b03aac9..fce9448 100644
+--- a/week-08/app/src/booking.ts
++++ b/week-08/app/src/booking.ts
+@@ -22,6 +22,5 @@ export function canBook({ start, end, now, blocked, bookings }: {
+     if (start < b.end && end > b.start) return false;
+   }
+   // keep the room's list current with the slot that was just found free
+-  bookings.push({ start, end });
+   return true;
+ }
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/Documents/Codex/2026-11-07/referenced-chatgpt-conversation-this-is-an/work/repo/week-08/app
+
+ ✓ src/booking.test.ts (21 tests | 20 skipped) 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 20 skipped (21)
+   Start at  10:28:50
+   Duration  297ms (transform 21ms, setup 0ms, collect 16ms, tests 1ms, environment 0ms, prepare 37ms)
+
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/Documents/Codex/2026-11-07/referenced-chatgpt-conversation-this-is-an/work/repo/week-08/app
+
+ ✓ src/booking.test.ts (21 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  10:28:51
+   Duration  177ms (transform 15ms, setup 0ms, collect 14ms, tests 2ms, environment 0ms, prepare 43ms)
 ```
 
 ---
+
+Codex applied the one-line deletion. The supplied stale comment is retained to keep the repair to exactly one deleted line. No mutation statement remains. Student review is still required; this is not represented as a manual student patch.
 
 ## 9. What still fails, and what AI-assisted debugging cannot do
 
