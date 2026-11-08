@@ -1,0 +1,12 @@
+{
+  "environment": "Codex subagent prompt-only simulation",
+  "not_installed": true,
+  "manual_typing": false,
+  "plain_context": "/root/plain_diagnosis",
+  "skill_context": "/root/skill_diagnosis",
+  "same_input_file": "diagnosis-input.txt",
+  "sha256": "96bf84f5d71fa572f062035ad9e291f02203fd0650b47b3b2758e15e48300aed",
+  "model": "not displayed",
+  "screenshot": "Unavailable: computer-use tool disallowed com.openai.codex",
+  "invocation_wrappers": "Plain context instructed to read only immutable input; skill context instructed to load SKILL.md then read same input. Question wording matches deck. These wrappers differ as disclosed."
+}

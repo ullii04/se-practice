@@ -482,18 +482,24 @@ One row per defect. At least **BUG-A and BUG-B**. "Suspected cause" is your hypo
 
 **The checks from the deck, before you zip it.** Answer each one yes / no:
 
-| Check | yes / no |
+| Check | yes |
 | --- | --- |
-| The file is plain UTF-8 text, named exactly `SKILL.md` (not `SKILL.md.txt`) | yes / no |
-| The first and the closing YAML delimiter are exactly three hyphens: `---` | yes / no |
-| `name` is lowercase with hyphens, and `description` says WHEN to use it | yes / no |
-| I read the whole file once: no passwords, API keys or private student data | yes / no |
+| The file is plain UTF-8 text, named exactly `SKILL.md` (not `SKILL.md.txt`) | yes |
+| The first and the closing YAML delimiter are exactly three hyphens: `---` | yes |
+| `name` is lowercase with hyphens, and `description` says WHEN to use it | yes |
+| I read the whole file once: no passwords, API keys or private student data | yes |
 
 **The contents of `skills/bug-detector.zip`.** Paste the listing (Windows: open the ZIP and copy
 the paths; macOS/Linux: `unzip -l skills/bug-detector.zip`):
 
 ```text
-(paste here)
+Archive:  bug-detector.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  11-08-2026 10:26   bug-detector/
+      570  11-08-2026 10:26   bug-detector/SKILL.md
+---------                     -------
+      570                     2 files
 ```
 
 **Installation.** Where you uploaded it, what the upload said, and whether a new chat showed the
@@ -501,6 +507,8 @@ skill as enabled. If upload was not available, write `prompt-only simulation` an
 Screenshot of the result: `evidence/install.png`.
 
 <!-- Write below this line -->
+Prompt-only simulation in two fresh Codex subagent contexts, not an installed ChatGPT or Claude skill. The deck text was transcribed by automation, NOT typed by the student. The skill context loaded SKILL.md before the identical input; the plain context did not load it. Both were instructed to avoid edits and test execution. The exact model version was not displayed; no override was selected. Screenshot capture of the Codex app was blocked by the computer-use tool, so evidence/install.png is absent and E1 will be declared. This is not a claim of literal manual typing or two ChatGPT web chats.
+
 
 ---
 
@@ -510,15 +518,94 @@ A **fresh chat, with no skill enabled**. Paste exactly what you sent: the deck's
 the same input you will use in section 6 (AC1–AC6, the failing test output, the code of
 `canBook`):
 
-```text
-(paste here)
-```
+````text
+Find the root cause of the failed room-booking test. Propose minimal patch and regression test. Do not edit code.
+
+AC1 Reject start >= end and requests in the past.
+AC2 Enforce the maximum allowed duration (120 minutes).
+AC3 Reject a blocked room.
+AC4 Reject overlaps; allow bookings that only touch at endpoints.
+AC5 Return Available / Unavailable without changing booking data.
+AC6 Preserve clear UI feedback on desktop and mobile.
+
+Test fixture for T01: start=660, end=720, now=540, blocked=false,
+bookings=[{ start: 600, end: 660 }].
+
+Observed failure (copied from the real Week 07-suite run):
+ FAIL  src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:29:72
+     27| describe('canBook', () => {
+     28|   it('T01: accepts a request touching the existing booking end', () =>…
+     29|     expect(expectUnchangedDecision(fixture({ start: 660, end: 720 })))…
+       |                                                                        ^
+     30|   });
+     31| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+
+Provided canBook:
+export function canBook({ start, end, now, blocked, bookings }: {
+  start: number;
+  end: number;
+  now: number;
+  blocked: boolean;
+  bookings: { start: number; end: number }[];
+}): boolean {
+  if (!(0 <= start && start < end && end <= 1440)) return false;
+  if (!(start > now)) return false;
+  if (end - start > 120) return false;
+  if (blocked) return false;
+  for (const b of bookings) {
+    if (start <= b.end && end >= b.start) return false;
+  }
+  // keep the room's list current with the slot that was just found free
+  bookings.push({ start, end });
+  return true;
+}
+````
 
 **The assistant's answer, pasted unedited:**
 
-```text
-(paste here)
+````text
+The failure comes from inclusive overlap comparisons:
+
+```ts
+if (start <= b.end && end >= b.start) return false;
 ```
+
+For T01, `start === b.end === 660`, so the function incorrectly rejects bookings that touch at an endpoint, violating AC4.
+
+There is also a separate AC5 violation: `bookings.push(...)` changes booking data when checking availability.
+
+Minimal patch:
+
+```diff
+-    if (start <= b.end && end >= b.start) return false;
++    if (start < b.end && end > b.start) return false;
+   }
+-  // keep the room's list current with the slot that was just found free
+-  bookings.push({ start, end });
+   return true;
+```
+
+Regression tests should verify:
+
+- Existing `[600, 660]`, request `[660, 720]`: `true`.
+- Existing `[720, 780]`, request `[660, 720]`: `true`.
+- Existing `[600, 661]`, request `[660, 720]`: `false`.
+- Booking data remains deeply unchanged after both accepted and rejected checks.
+
+Use `now=540` and `blocked=false` for these cases. No tests were run.
+````
 
 ---
 
@@ -527,17 +614,75 @@ the same input you will use in section 6 (AC1–AC6, the failing test output, th
 **Another fresh chat, with `bug-detector` enabled.** Send exactly the same input as in section 5.
 Only the question changes, to the deck's skill question:
 
-```text
-(paste here)
-```
+````text
+Use the bug-detector skill to diagnose the failed room-booking test.
+
+AC1 Reject start >= end and requests in the past.
+AC2 Enforce the maximum allowed duration (120 minutes).
+AC3 Reject a blocked room.
+AC4 Reject overlaps; allow bookings that only touch at endpoints.
+AC5 Return Available / Unavailable without changing booking data.
+AC6 Preserve clear UI feedback on desktop and mobile.
+
+Test fixture for T01: start=660, end=720, now=540, blocked=false,
+bookings=[{ start: 600, end: 660 }].
+
+Observed failure (copied from the real Week 07-suite run):
+ FAIL  src/booking.test.ts > canBook > T01: accepts a request touching the existing booking end
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:29:72
+     27| describe('canBook', () => {
+     28|   it('T01: accepts a request touching the existing booking end', () =>…
+     29|     expect(expectUnchangedDecision(fixture({ start: 660, end: 720 })))…
+       |                                                                        ^
+     30|   });
+     31| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+
+Provided canBook:
+export function canBook({ start, end, now, blocked, bookings }: {
+  start: number;
+  end: number;
+  now: number;
+  blocked: boolean;
+  bookings: { start: number; end: number }[];
+}): boolean {
+  if (!(0 <= start && start < end && end <= 1440)) return false;
+  if (!(start > now)) return false;
+  if (end - start > 120) return false;
+  if (blocked) return false;
+  for (const b of bookings) {
+    if (start <= b.end && end >= b.start) return false;
+  }
+  // keep the room's list current with the slot that was just found free
+  bookings.push({ start, end });
+  return true;
+}
+````
 
 **The assistant's answer, pasted unedited:**
 
-```text
-(paste here)
-```
+````text
+| Defect | Evidence | Root cause | Fix | Test |
+|---|---|---|---|---|
+| **Confirmed: endpoint contact is rejected, violating AC4.** | T01 requests `[660,720]` beside existing `[600,660]`; the supplied failure reports `false` instead of `true` at `src/booking.test.ts:29`. | `start <= b.end && end >= b.start` treats touching endpoints as overlap. For T01, both comparisons are true. | Use `start < b.end && end > b.start`. | With the supplied T01 fixture, expect `true`. Also test a request ending at an existing booking’s start; expect `true`. A genuine overlap must return `false`. |
+| **Confirmed: successful checks mutate booking data, violating AC5.** | The provided function calls `bookings.push({ start, end })` before returning `true`. T01 currently exits before reaching this line. | An availability check also creates a booking. | Remove the `bookings.push(...)` statement. | Use a valid request with `bookings=[]`; expect `true` and the array to remain empty. |
 
-Did the environment show that the skill was invoked? yes / no / not shown
+**Hypothesis requiring clarification:** `start > now` rejects a request beginning exactly now. AC1 prohibits requests in the past but does not explicitly settle equality. If starting now is allowed, change this check to `start >= now` and add an equality regression test.
+
+The supplied fixture provides a deterministic reproduction by inspection; I did not execute tests. AC6 cannot be assessed from the provided function and failure.
+````
+
+Did the environment show that the skill was invoked? not shown (prompt-only loading, no installed-skill badge)
 
 ---
 
