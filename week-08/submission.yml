@@ -1,0 +1,39 @@
+schema: 1
+week: "08"
+student:
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  github: "ullii04"
+assistant:
+  tool: "Codex desktop"
+  model: "not displayed"
+skill:
+  environment: "prompt-only"
+  invoked: "not-shown"
+project:
+  language: "ts"
+  vitest: "3.2.4"
+counts:
+  tests_final: 21
+  buggy_failed: 6
+  defects_logged: 2
+  lines_changed: 2
+checker:
+  pass: 29
+  fail: 1
+  error: 1
+  commit: "b22891a"
+  known_fails: [E1, L4]
+verdict:
+  skill_helped: "no-difference"
+review_findings:
+  - "BUG-A: inclusive comparisons reject endpoint contact; strict comparisons pass the both-sides regression."
+  - "BUG-B: AC5 originally failed at availability, masking mutation; the non-touching regression reaches the push."
+  - "T02: equality with now is already rejected by the Week 07 contract, so the extra skill hypothesis was not adopted."
+  - "SKILL.md: exact deck text was transcribed by Codex, not manually typed by the student; mode is prompt-only."
+  - "lab-report.md: L4 parser stops at an embedded code fence; full unedited answer is preserved."
+honesty:
+  buggy_function_pasted_unchanged: yes
+  same_input_both_chats: yes
+  outputs_unedited: yes
+  ai_usage_disclosed: yes

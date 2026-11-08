@@ -1,0 +1,15 @@
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/Documents/Codex/2026-11-07/referenced-chatgpt-conversation-this-is-an/work/repo/week-08/app
+
+ ✓ src/booking.test.ts (19 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  10:23:45
+   Duration  273ms (transform 17ms, setup 0ms, collect 15ms, tests 2ms, environment 0ms, prepare 30ms)
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.2
+npm notice To update run: npm install -g npm@11.21.2
+npm notice

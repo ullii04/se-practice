@@ -1,0 +1,10 @@
+
+ RUN  v3.2.4 /Users/elshibaiulzhalgas/Documents/Codex/2026-11-07/referenced-chatgpt-conversation-this-is-an/work/repo/week-08/app
+
+ ✓ src/booking.test.ts (21 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  10:28:51
+   Duration  177ms (transform 15ms, setup 0ms, collect 14ms, tests 2ms, environment 0ms, prepare 43ms)
+
