@@ -22,7 +22,7 @@ checker:
   pass: 29
   fail: 1
   error: 1
-  commit: "a6051a9"
+  commit: "b22891a"
   known_fails: [E1, L4]
 verdict:
   skill_helped: "no-difference"

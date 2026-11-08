@@ -9,7 +9,7 @@ PASS   D6   assistant.model is an exact model name or not displayed  assistant.m
 PASS   D7   skill and project                                        prompt-only, ts, Vitest 3.2.4
 PASS   D8   checker numbers add up                                   pass + fail + error = 31
 PASS   D9   checker numbers match a run made now                     declared 29/1/1, a run now gives 29/1/1
-PASS   D10  checker.commit                                           checker.commit: a6051a9
+PASS   D10  checker.commit                                           checker.commit: b22891a
 PASS   D11  known_fails lists exactly what still fails               known_fails matches the checker: ['E1', 'L4']
 PASS   D12  counts match the files and lab-report.md                 counts filled and match
 PASS   D13  verdict.skill_helped is decided                          skill_helped: no-difference
