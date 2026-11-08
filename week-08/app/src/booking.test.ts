@@ -112,4 +112,18 @@ describe('canBook', () => {
   it('N2: rejects a start before now without booking conflicts', () => {
     expect(expectUnchangedDecision(fixture({ start: 539, end: 570, now: 540, bookings: [] }))).toBe(false);
   });
+  it('BUG-A: accepts a request touching bookings on both sides', () => {
+    const request = fixture({
+      start: 660, end: 720,
+      bookings: [{ start: 600, end: 660 }, { start: 720, end: 780 }],
+    });
+    expect(canBook(request)).toBe(true);
+  });
+
+  it('BUG-B: an available non-touching request leaves bookings unchanged', () => {
+    const request = fixture({ start: 720, end: 780 });
+    const before = request.bookings.map((booking) => ({ ...booking }));
+    expect(canBook(request)).toBe(true);
+    expect(request.bookings).toStrictEqual(before);
+  });
 });
