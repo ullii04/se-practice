@@ -1024,12 +1024,18 @@ Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run i
 
 | Check | Why it stays |
 | --- | --- |
-| | |
+| E1 | Real screenshot unavailable: computer-use tool disallowed access to com.openai.codex. No image was fabricated. |
+| L4 | Checker regex stops at the first embedded triple-backtick code fence in the verbatim plain answer, seeing fewer than 30 words. The full unedited answer is present inside a valid four-backtick outer block in section 5 and in evidence/plain-answer.md; checker was not edited. |
+
+Actual checker result: 29 PASS, 1 FAIL (L4), 1 ERROR (E1). Typecheck and production build passed; build emitted the existing outdated Browserslist-data advisory. No fresh desktop/mobile UI evidence is claimed.
 
 ### 9.2 One limitation of AI-assisted debugging
 
 <!-- Use something that actually happened in sections 5-8. 20 words or more. -->
--
+The skill diagnosis suggested reconsidering start == now because AC1 alone was ambiguous. T02 already resolves this boundary as rejected. The extra hypothesis was not a demonstrated defect and was not adopted. Both diagnoses inspected the same input; neither executed tests, and agreement between them is not independent verification. The real regression runs, not the assistant responses, establish the observed fixes.
+
+Additional limitations: student manual transcription was not performed; the fixed deck skill was written by automation, and Codex authored the hypotheses, tests, comparison, report organization and patches. The two diagnostic contexts were isolated Codex subagents, not standalone ChatGPT web chats. Exact models were not displayed, so model identity could not be independently frozen or verified. UI behavior on desktop/mobile was not newly exercised. SETUP.md is absent from the supplied ZIP and main/week-07 trees (also no SETUP path in fetched branch history), so its exact five-section PR template cannot be verified; a five-section description will disclose this rather than claiming exact compliance.
+
 
 ---
 
@@ -1044,3 +1050,5 @@ Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run i
      visible after the BUG-A patch: the AC5 test had been failing for the wrong reason." -->
 
 <!-- Write your conclusion below this line -->
+
+Each reported bug reduced to a one-line defect, BUG-A treating touching endpoints as an overlap and BUG-B mutating the caller's bookings array through an unwanted push. The overlap test now reads start < b.end && end > b.start, and the push is gone, so back-to-back slots are accepted and the original bookings array stays untouched. With these two minimal changes the suite passes 21 of 21, and both diagnostic runs found both bugs, though the skill version also raised a start == now edge case that T02 already requires rejecting. AI assistance drafted the reproduction tests, executed the fixes, and compiled the evidence. §7 judges the skill against the code rather than against the other prompt, so no unaided authorship is claimed, and the shared input remains the honest limitation
