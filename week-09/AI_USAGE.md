@@ -1,26 +1,19 @@
 # AI Usage Disclosure — Week 09
 
-Required by the course academic policy (Generative AI use level **D — AI-integrated**).
-You are responsible for the accuracy, testing and integrity of everything you submit,
-including anything an AI tool produced.
-
 | Tool | Exact model / plan | Used for | Which files it touched |
 | --- | --- | --- | --- |
-| | | Part 2 — writing the calls for R1, R2, R3 | calls/ (saved by me, unedited) |
-| | | | |
+| Codex | not displayed | Part 2 — three fresh context-isolated chats; one unchanged README request each | calls/r1.json, calls/r2.json, calls/r3.txt |
+| Codex | not displayed | Read instructions/PDF, author schema and report, explain constraints, run checks, organize commits and PR | tool/check_room.json, lab-report.md, AI_USAGE.md, submission.yml, evidence/ |
 
-**I wrote `tool/check_room.json` myself:** yes / no
-<!-- If an AI wrote or revised any of it, say which part, and how you checked it. -->
+**I wrote `tool/check_room.json` myself:** no. Codex wrote the complete definition. It was checked against the provided twelve fixed calls and the allowed-keyword checks. The student must review its constraints; automated passing does not establish student understanding.
 
-**I used an AI to explain a JSON Schema keyword or a check:** yes / no
-<!-- If "yes": which one, and for what. -->
+**I used an AI to explain a JSON Schema keyword or a check:** yes. Codex explained type, required, bounds, additionalProperties, nested items, and the distinction between shape and AC1–AC6 semantics in the report.
 
-**Every reply in `calls/` and in lab-report.md section 4 is exactly what the model returned:** yes / no
+**Every reply in calls/ and in lab-report.md section 4 is exactly what the model returned:** yes. Each saved final reply is copied unchanged; no retries or corrections. Fresh chats were agent sessions with fork_turns=none, not three turns in this parent chat. The model identifier was not displayed.
 
-**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes / no
+**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes. Section 8 is inserted directly from captured stdout. Section 3 and evidence/first-run-s.json record verdicts from the genuine first run rather than claiming to be raw stdout.
 
-**Anything I accepted from the AI without fully understanding it:**
-<!-- Name the file and the part. An honest entry here costs far less than a blank one that turns out to be untrue. -->
+**Anything I accepted from the AI without fully understanding it:** Student understanding has not been verified. The whole schema, report including conclusion, permission decisions, and declaration were AI-drafted and need student review before submission. No independent authorship or student signature is asserted.
 
-Signed: <your name>
-Date:
+Signed: Codex (AI preparer on behalf of Elshibai Ulzhalgas; student review and signature pending)
+Date: 2026-11-15
