@@ -1,0 +1,30 @@
+schema: 1
+week: "09"
+student:
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  github: "ullii04"
+assistant:
+  tool: "Codex"
+  model: "not displayed"
+  fresh_chats: yes
+calls:
+  r3: asked
+  first_run_s_fails: 9
+checker:
+  pass: 30
+  fail: 0
+  error: 0
+  commit: "2caaf8e"
+  known_fails: []
+review_findings:
+  - "S03 and S10: integer types reject clock strings and fractional minutes that the starter accepted."
+  - "R2: end=990 correctly represents 16:30; AC2 and AC3 make the valid-shaped query unavailable."
+  - "R3: the model asked for missing required arguments instead of inventing an afternoon interval."
+  - "A8: exporting .env to an untrusted MCP server would disclose credentials and must be blocked."
+  - "lab-report.md: SETUP.md is absent from every fetched branch, so exact PR headings cannot be verified."
+honesty:
+  definition_written_by_me: no
+  calls_unedited: yes
+  outputs_unedited: yes
+  ai_usage_disclosed: yes
