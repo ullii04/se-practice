@@ -1,0 +1,5 @@
+# Model-call provenance
+
+Fresh independent Codex agent chats: /root/r1, /root/r2, /root/r3. Each was started with fork_turns=none and only its corresponding prompt. They inherited the same default model; its exact identifier was not displayed. The complete final replies were copied unchanged into calls/ and report section 4. Prompt text is preserved here. No follow-up prompts or retries were sent. These are textual function-call simulations as requested by the README, not actual service invocations.
+
+The first checker invocation occurred on the untouched extracted archive, before the repository was cloned. First-run S verdicts and overall counts are transcribed in first-run-s.json; original stdout is in the parent Codex chat. The starter is preserved in commit 52426ca. An intermediate run after drafting had 29 PASS / 1 FAIL / 0 ERROR because the AI usage row did not begin with the literal Part 2 expected by L5. The row wording was corrected without changing its meaning. No checker code was edited.
