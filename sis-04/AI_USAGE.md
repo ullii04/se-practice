@@ -1,35 +1,12 @@
-# AI Usage Disclosure — SIS #04
+# SIS 04 AI usage disclosure
 
-Required by the course academic policy (Generative AI use level **D — AI-integrated**).
-You are responsible for the accuracy, testing and integrity of everything you submit,
-including anything an AI tool produced.
+Course AI-use level D. The student is responsible for verifying and defending the submission.
 
-| Tool | Exact model / plan | Date | Used for | Which files it touched |
-| --- | --- | --- | --- | --- |
-| | | | codebase analysis (Task 1) | |
-| | | | improvement plan | |
-| | | | feature extension (Task 2) | |
-| | | | refactoring (Task 3) | |
-| | | | tests (Task 4) | |
+| Tool | Exact model | Work performed |
+| --- | --- | --- |
+| Codex desktop | not displayed | Set up the Week 08 checkpoint, checked baseline files, designed and implemented the catalog, tests, and refactor, ran commands, gathered browser evidence, rendered diagrams, and prepared report sections 1–9 and the declaration. |
+| Codex desktop review subagent | not displayed | Reviewed the baseline, plan and test design. Exported its three authentic exchanges; it did not modify the project. |
 
-<!-- Delete rows you did not use the assistant for; add rows for anything else. The optional
-     extension (an existing skill or a read-only MCP server) goes here too, with its permissions. -->
+Section 8 records the prompts and used answers. Codex reviewed the source, ran the automated tests and interacted with the browser. The student supplied the reflection in section 10 verbatim. Local absolute paths were redacted from the terminal output; test counts, timings and verdicts were preserved.
 
-**The assistant wrote, or helped write, tests in `app/`:** yes / no
-<!-- Either answer is allowed. If "yes": which tests, and how you checked that their EXPECTED values
-     come from AC1–AC5 and F1–F5, not from what the code happens to return. -->
-
-**Every run pasted in report.md was produced by my code on my machine (or Codespace), unedited:** yes / no
-
-**Every number in report.md section 7 was measured the way its row says:** yes / no
-
-**I shared no credentials, keys or private data with any tool:** yes / no
-
-**Everything I submitted, I can explain and defend in class — including filterRooms, checkRoom and
-why each module exists:** yes / no
-
-**Anything I accepted from the AI without fully understanding it:**
-<!-- Name the file and the line. An honest entry here costs far less than a blank one that turns out to be untrue. -->
-
-Signed: <your name>
-Date:
+The blocked-room filter suggestion was changed to preserve labeled blocked matches. The booking function enforces F3. The baseline application tree matched the Week 08 source exactly. The student approved use of the course identity fields in the declaration.
