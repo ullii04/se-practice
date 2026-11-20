@@ -6,80 +6,74 @@
 
 ## 1. Setup and starting point
 
-<!-- Model: the exact model with its version, as the tool shows it ("ChatGPT" is a tool, not a
-     model). If the tool does not show it, write: not displayed
-     Starting point: week-08 | week-07 | sis-03 | starter   (README section 3)
-     Baseline commit: the commit that brings your starting point into sis-04/app/ UNCHANGED —
-     git rev-parse --short HEAD right after that commit. It is your "initial version". -->
-
 | Item | Value |
 | --- | --- |
-| Assistant (tool) | (write here) |
-| Assistant model | (write here) |
-| Starting point | (write here) |
-| Baseline commit | (write here) |
-| Language (ts or js) | (write here) |
-| Vitest version | (write here) |
-| Where I ran the tests | (write here) |
+| Assistant (tool) | Codex desktop |
+| Assistant model | not displayed |
+| Starting point | week-08 |
+| Baseline commit | 45bad0c |
+| Language (ts or js) | ts |
+| Vitest version | 3.2.4 |
+| Where I ran the tests | Local macOS terminal via Codex |
 
 ### 1.1 Baseline run
 
-<!-- Before you change anything: run the tests of your starting point inside app/ and paste the
-     REAL output. No tests yet (starter, sis-03)? Paste the run anyway: Vitest prints
-     "No test files found". That is your honest "original" number, 0/0. -->
+Real baseline output; only the local absolute path is redacted.
 
 ```text
-(paste here)
+ RUN  v3.2.4 [local path]/sis-04/app
+
+ ✓ src/booking.test.ts (21 tests) 2ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  02:06:06
+   Duration  213ms (transform 26ms, setup 0ms, collect 16ms, tests 2ms, environment 0ms, prepare 55ms)
 ```
 
 ## 2. Context for the assistant
 
 ### 2.1 Repository map
 
-<!-- The concise map you gave the assistant: the files that matter and one line each on what
-     they do. A tree is fine:  src/App.tsx — the page, holds the rooms and the form … -->
-
 ```text
-(paste here)
+src/App.tsx — selection, time form and result state
+src/booking.ts — pure canBook predicate
+src/booking.test.ts — 21 Week 08 tests
+src/lib/validation.ts — rejection messages with duplicated rules
+src/lib/sampleData.ts, src/lib/types.ts — baseline fixtures and data shapes
+src/lib/format.ts — fixed clock and time labels
+src/components/RoomList.tsx, Timeline.tsx, ResultBanner.tsx — rendering
 ```
 
 ### 2.2 The context message as sent
 
-<!-- The whole first message of your analysis chat: the map, AC1–AC6, F1–F5 and the constraints
-     (no login, payments, live APIs or database; fictional data only). Unedited. -->
-
 ```text
-(paste here)
+Read-only planning request for Smart Campus SIS 04. Repository map: src/App.tsx owns input parsing, selected room, prior result and renders RoomList, Timeline, ResultBanner. src/booking.ts exports pure canBook and src/booking.test.ts has the Week 08 suite. src/lib/validation.ts wraps canBook and repeats rejection rules. src/lib/sampleData.ts and types.ts hold fixtures/types, format.ts holds the fixed clock. AC1 reject start ≥ end and past; AC2 max 120 minutes; AC3 reject blocked; AC4 reject overlap, allow touching; AC5 no mutation; AC6 clear responsive feedback. F1 capacity >= attendees, F2 all equipment required, F3 blocked never available, F4 explicit no-match state, F5 changing selection refreshes using that room's bookings. Four fictional rooms, fixed clock, no login, payment, network, storage or database. Required rooms.ts, filter.ts, booking.ts, separate UI. Identify three maintainability risks with file references and outline a small incremental plan. Please give analysis and a plan only, no code or file writes.
 ```
 
 ## 3. Codebase analysis (Task 1)
 
 ### 3.1 Maintainability risks
 
-<!-- At least three, found in YOUR starting code. "Where" names a file or a function(),
-     e.g. src/App.tsx, check(). Evidence is what you saw, not what the assistant said.
-     Priority: High / Medium / Low. -->
-
 | # | Risk | Where (file / function) | Evidence | Priority |
 | --- | --- | --- | --- | --- |
-| 1 | (write here) | (write here) | (write here) | High / Medium / Low |
-| 2 | (write here) | (write here) | (write here) | High / Medium / Low |
-| 3 | (write here) | (write here) | (write here) | High / Medium / Low |
+| 1 | Rule drift | src/lib/validation.ts checkAvailability and src/booking.ts canBook | Both explicitly enforce 120 minutes, blocked rooms, and overlap. App also calls canBook before calling checkAvailability. | High |
+| 2 | Result detached from selection | src/App.tsx handleCheck and room selection callbacks | result is stored separately while room selection only sets selectedRoomId. Editing times also leaves prior feedback visible. | High |
+| 3 | Fragile interactive room card | src/components/RoomList.tsx | The room-selection button contains a second button that mutates the blocked flag. The catalog should expose a stable fictional blocked state and one control per card. | Medium |
+| 4 | Incomplete catalog data contract | src/lib/sampleData.ts, src/lib/types.ts | The baseline contains three rooms. The Room type has no equipment field. | Medium |
 
 ### 3.2 Improvement plan — before editing
 
-<!-- Numbered, in the order you will do it, smallest safe step first. Written BEFORE you change
-     code: the commit that adds this section comes before the commit that changes app/src. -->
-
-1. (write here)
-2. (write here)
-3. (write here)
+1. Keep the 21 contract tests and tag their existing boundary assertions. Add focused filter and room-selection cases against test-local fixtures.
+2. Add rooms.ts, pure filterRooms and checkRoom. Verify capacity equality, strict equipment subset and selected-room behavior.
+3. Wire the catalog and filters into the existing UI. After an explicit check, room switching should refresh the result at the same times; time edits and filter changes clear the result.
+4. Remove duplicate rule checks, retain clear feedback, update component diagrams and verify both desktop and mobile.
 
 ### 3.3 One AI suggestion I rejected or modified
 
 | Suggestion (as the assistant made it) | Decision | Why — with the AC, F-rule, test or file behind it |
 | --- | --- | --- |
-| (write here) | Rejected / Modified | (write here) |
+| implement the capacity, required equipment, and blocked-room predicates in pure filter.ts | Modified | F1 and F2 describe catalog filters. A blocked room remains visible and labeled, while F3 and AC3 are enforced in checkRoom via canBook. |
 
 ## 4. Feature extension (Task 2)
 
