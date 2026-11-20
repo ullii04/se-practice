@@ -1,5 +1,5 @@
 import { CheckCircle2, XCircle } from 'lucide-react';
-import type { AvailabilityResult } from '@/lib/types';
+export type AvailabilityResult = { available: true } | { available: false; reason: string };
 
 interface Props {
   result: AvailabilityResult | null;

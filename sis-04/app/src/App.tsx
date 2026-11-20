@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { Clock, CheckCircle2 } from 'lucide-react';
-import { rooms as sampleRooms } from '@/lib/sampleData';
-import { checkAvailability } from '@/lib/validation';
-import { canBook } from './booking';
+import { ROOMS } from './rooms';
+import { checkRoom } from './booking';
+import { filterRooms } from './filter';
 import { minutesToLabel, CURRENT_TIME } from '@/lib/format';
-import type { AvailabilityResult } from '@/lib/types';
 import RoomList from '@/components/RoomList';
 import Timeline from '@/components/Timeline';
-import ResultBanner from '@/components/ResultBanner';
+import ResultBanner, { type AvailabilityResult } from '@/components/ResultBanner';
+import RoomFilters from '@/components/RoomFilters';
+
+const equipmentOptions = [...new Set(ROOMS.flatMap((room) => room.equipment))].sort();
 
 function App() {
-  const [rooms, setRooms] = useState(sampleRooms);
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(sampleRooms[0].id);
+  const [selectedRoomId, setSelectedRoomId] = useState(ROOMS[0].id);
+  const [attendees, setAttendees] = useState('');
+  const [equipment, setEquipment] = useState<string[]>([]);
   const [startStr, setStartStr] = useState('');
   const [endStr, setEndStr] = useState('');
-  const [result, setResult] = useState<AvailabilityResult | null>(null);
+  const [checked, setChecked] = useState(false);
 
-  const selectedRoom = rooms.find((r) => r.id === selectedRoomId) ?? null;
+  const matches = filterRooms(ROOMS, { attendees: Number(attendees), equipment });
+  const selectedRoom = matches.find((room) => room.id === selectedRoomId) ?? matches[0];
 
   function parseTimeToMinutes(value: string): number | null {
     const match = /^(\d{1,2}):(\d{2})$/.exec(value.trim());
@@ -30,33 +34,32 @@ function App() {
   const candidateStart = startStr ? parseTimeToMinutes(startStr) : null;
   const candidateEnd = endStr ? parseTimeToMinutes(endStr) : null;
 
-  function handleCheck() {
-    if (!selectedRoom) {
-      setResult({ available: false, reason: 'Please select a room.' });
-      return;
+  let result: AvailabilityResult | null = null;
+  if (checked && selectedRoom) {
+    if (candidateStart === null || candidateEnd === null) {
+      result = { available: false, reason: 'Enter valid start and end times.' };
+    } else {
+      const available = checkRoom(matches, selectedRoom.id, {
+        start: candidateStart, end: candidateEnd, now: CURRENT_TIME,
+      });
+      result = available ? { available: true } : {
+        available: false,
+        reason: 'This room cannot be booked for the selected time. Try a different time or room.',
+      };
     }
-    const s = parseTimeToMinutes(startStr);
-    const e = parseTimeToMinutes(endStr);
-    if (s === null || e === null) {
-      setResult({ available: false, reason: 'Please enter valid times in HH:MM format.' });
-      return;
-    }
-    const available = canBook({ start: s, end: e, now: CURRENT_TIME,
-      blocked: selectedRoom.blocked, bookings: selectedRoom.bookings });
-    setResult(available ? { available: true } : checkAvailability(selectedRoom, s, e, CURRENT_TIME));
   }
 
   function handleReset() {
     setStartStr('');
     setEndStr('');
-    setResult(null);
+    setChecked(false);
   }
 
-  function toggleBlocked(roomId: string) {
-    setRooms((prev) =>
-      prev.map((r) => (r.id === roomId ? { ...r, blocked: !r.blocked } : r))
-    );
-    setResult(null);
+  function toggleEquipment(item: string) {
+    setEquipment((current) => current.includes(item)
+      ? current.filter((selected) => selected !== item)
+      : [...current, item]);
+    setChecked(false);
   }
 
   return (
@@ -78,11 +81,18 @@ function App() {
       </header>
 
       <main className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6">
+        <RoomFilters
+          attendees={attendees}
+          equipment={equipment}
+          options={equipmentOptions}
+          onAttendeesChange={(value) => { setAttendees(value); setChecked(false); }}
+          onEquipmentToggle={toggleEquipment}
+        />
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Select a room
+            Matching rooms
           </h2>
-          <RoomList rooms={rooms} selectedRoomId={selectedRoomId} onSelect={setSelectedRoomId} onToggleBlocked={toggleBlocked} />
+          <RoomList rooms={matches} selectedRoomId={selectedRoom?.id} onSelect={setSelectedRoomId} />
         </section>
 
         {selectedRoom && (
@@ -93,32 +103,34 @@ function App() {
               </h2>
               <div className="grid gap-4 sm:grid-cols-3 sm:items-end">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label htmlFor="slot-start" className="mb-1 block text-sm font-medium text-slate-700">
                     Start time
                   </label>
                   <input
+                    id="slot-start"
                     type="time"
                     value={startStr}
-                    onChange={(e) => setStartStr(e.target.value)}
+                    onChange={(e) => { setStartStr(e.target.value); setChecked(false); }}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
                     placeholder="HH:MM"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
+                  <label htmlFor="slot-end" className="mb-1 block text-sm font-medium text-slate-700">
                     End time
                   </label>
                   <input
+                    id="slot-end"
                     type="time"
                     value={endStr}
-                    onChange={(e) => setEndStr(e.target.value)}
+                    onChange={(e) => { setEndStr(e.target.value); setChecked(false); }}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
                     placeholder="HH:MM"
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={handleCheck}
+                    onClick={() => setChecked(true)}
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-teal-600 px-4 py-2 font-medium text-white transition-colors hover:bg-teal-700"
                   >
                     <CheckCircle2 className="h-4 w-4" /> Check
@@ -144,7 +156,7 @@ function App() {
               available={result?.available ?? null}
             />
 
-            {result && <ResultBanner result={result} />}
+            <div aria-live="polite"><ResultBanner result={result} /></div>
           </>
         )}
       </main>

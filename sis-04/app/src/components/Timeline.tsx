@@ -1,4 +1,4 @@
-import type { Room } from '@/lib/types';
+import type { Room } from '@/rooms';
 import { minutesToLabel } from '@/lib/format';
 
 interface Props {
@@ -12,10 +12,8 @@ export default function Timeline({ room, candidateStart, candidateEnd, available
   const blocks: (Room['bookings'][number] & { kind: 'booked' | 'candidate' })[] = [...room.bookings.map((b) => ({ ...b, kind: 'booked' as const }))];
   if (candidateStart !== null && candidateEnd !== null) {
     blocks.push({
-      id: 'candidate',
       start: candidateStart,
       end: candidateEnd,
-      bookedBy: 'Your request',
       kind: 'candidate' as const,
     });
   }
@@ -41,13 +39,11 @@ export default function Timeline({ room, candidateStart, candidateEnd, available
                 : 'bg-slate-400';
             return (
               <div
-                key={b.id}
-                className={`absolute top-0 h-full ${bg} flex items-center justify-center text-[10px] font-medium text-white`}
+                key={`${b.kind}-${b.start}-${b.end}`}
+                className={`absolute top-0 h-full ${bg}`}
                 style={{ left: `${left}%`, width: `${width}%` }}
-                title={`${minutesToLabel(b.start)}–${minutesToLabel(b.end)} ${b.bookedBy}`}
-              >
-                {width > 4 ? `${minutesToLabel(b.start)}` : ''}
-              </div>
+                title={`${minutesToLabel(b.start)}–${minutesToLabel(b.end)}`}
+              />
             );
           })}
         </div>
