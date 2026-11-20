@@ -33,6 +33,12 @@ describe('canBook', () => {
     expect(expectUnchangedDecision(fixture({ start: 540, end: 570 }))).toBe(false);
   });
 
+  it('R2 AC1: rejects availability when the current time is non-finite', () => {
+    const request = fixture({ now: Number.NEGATIVE_INFINITY, bookings: [] });
+
+    expect(expectUnchangedDecision(request)).toBe(false);
+  });
+
   it('T03: rejects equal start and end', () => {
     expect(expectUnchangedDecision(fixture({ start: 720, end: 720 }))).toBe(false);
   });
