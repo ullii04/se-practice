@@ -7,20 +7,20 @@ export interface BookingRequest {
   bookings: Booking[];
 }
 
-export function canBook({ start, end, now, blocked, bookings }: {
-  start: number;
-  end: number;
-  now: number;
-  blocked: boolean;
-  bookings: { start: number; end: number }[];
-}): boolean {
-  if (!(0 <= start && start < end && end <= 1440)) return false;
-  if (!(start > now)) return false;
-  if (end - start > 120) return false;
-  if (blocked) return false;
-  for (const b of bookings) {
-    if (start < b.end && end > b.start) return false;
+export function bookingRejectionReason({ start, end, now, blocked, bookings }: BookingRequest): string | null {
+  if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end > 1440) {
+    return 'Time must be between 00:00 and 24:00.';
   }
-  // keep the room's list current with the slot that was just found free
-  return true;
+  if (start >= end) return 'Start time must be before end time.';
+  if (!Number.isFinite(now) || start <= now) return 'Start time must be after the current time.';
+  if (end - start > 120) return 'Bookings cannot be longer than 120 minutes.';
+  if (blocked) return 'This room is currently blocked and cannot be booked.';
+  if (bookings.some((booking) => start < booking.end && end > booking.start)) {
+    return 'The selected time overlaps an existing booking.';
+  }
+  return null;
+}
+
+export function canBook(request: BookingRequest): boolean {
+  return bookingRejectionReason(request) === null;
 }
