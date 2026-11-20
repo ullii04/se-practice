@@ -25,11 +25,15 @@ function expectUnchangedDecision(request: BookingRequest): boolean {
 }
 
 describe('canBook', () => {
-  it('T01: accepts a request touching the existing booking end', () => {
-    expect(expectUnchangedDecision(fixture({ start: 660, end: 720 }))).toBe(true);
+  it('T01 B3 AC4: accepts a request touching the existing booking end', () => {
+    const request = fixture({ start: 660, end: 720 });
+    const before = structuredClone(request.bookings);
+
+    expect(canBook(request)).toBe(true);
+    expect(request.bookings).toStrictEqual(before);
   });
 
-  it('T02: rejects a start equal to now', () => {
+  it('T02 AC1: rejects a start equal to now', () => {
     expect(expectUnchangedDecision(fixture({ start: 540, end: 570 }))).toBe(false);
   });
 
@@ -45,20 +49,32 @@ describe('canBook', () => {
     expect(expectUnchangedDecision(fixture({ start: 1380, end: 1441 }))).toBe(false);
   });
 
-  it('T06: accepts a duration of exactly 120 minutes', () => {
-    expect(expectUnchangedDecision(fixture({ start: 720, end: 840 }))).toBe(true);
+  it('T06 B1 AC2: accepts a duration of exactly 120 minutes', () => {
+    const request = fixture({ start: 720, end: 840 });
+    const before = structuredClone(request.bookings);
+
+    expect(canBook(request)).toBe(true);
+    expect(request.bookings).toStrictEqual(before);
   });
 
-  it('T07: rejects a duration of 121 minutes', () => {
-    expect(expectUnchangedDecision(fixture({ start: 720, end: 841 }))).toBe(false);
+  it('T07 B2: rejects a duration of 121 minutes', () => {
+    const request = fixture({ start: 720, end: 841 });
+    const before = structuredClone(request.bookings);
+
+    expect(canBook(request)).toBe(false);
+    expect(request.bookings).toStrictEqual(before);
   });
 
   it('T08: accepts a request touching the existing booking start', () => {
     expect(expectUnchangedDecision(fixture({ start: 570, end: 600 }))).toBe(true);
   });
 
-  it('T09: rejects a partial overlap', () => {
-    expect(expectUnchangedDecision(fixture({ start: 630, end: 690 }))).toBe(false);
+  it('T09 B4: rejects a partial overlap', () => {
+    const request = fixture({ start: 630, end: 690 });
+    const before = structuredClone(request.bookings);
+
+    expect(canBook(request)).toBe(false);
+    expect(request.bookings).toStrictEqual(before);
   });
 
   it('T10: rejects a request containing the existing booking', () => {
@@ -73,7 +89,7 @@ describe('canBook', () => {
     expect(expectUnchangedDecision(fixture({ start: 600, end: 660 }))).toBe(false);
   });
 
-  it('T13: rejects an otherwise valid request when the room is blocked', () => {
+  it('T13 AC3: rejects an otherwise valid request when the room is blocked', () => {
     expect(expectUnchangedDecision(fixture({ start: 660, end: 720, blocked: true }))).toBe(false);
   });
 
