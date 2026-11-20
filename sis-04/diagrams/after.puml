@@ -1,0 +1,27 @@
+@startuml
+title SIS 04 room catalog
+component "App" as App
+component "RoomFilters" as Controls
+component "RoomList" as List
+component "Timeline" as Timeline
+component "ResultBanner" as Banner
+component "rooms" as Rooms
+component "filter" as Filter
+component "booking" as Booking
+component "lib/format" as Format
+App --> Controls
+App --> List
+App --> Timeline
+App --> Banner
+App --> Rooms
+App --> Filter
+App --> Booking
+App --> Format
+Filter ..> Rooms : type only
+Booking ..> Rooms : type only
+Rooms ..> Booking : type only
+List ..> Rooms : type only
+Timeline ..> Rooms : type only
+List --> Format
+Timeline --> Format
+@enduml

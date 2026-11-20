@@ -1,0 +1,28 @@
+@startuml
+title Week 08 baseline
+component "App" as App
+component "RoomList" as List
+component "Timeline" as Timeline
+component "ResultBanner" as Banner
+component "lib/sampleData" as Data
+component "lib/types" as Types
+component "lib/format" as Format
+component "lib/validation" as Validation
+component "booking" as Booking
+App --> List
+App --> Timeline
+App --> Banner
+App --> Data
+App --> Format
+App --> Types
+App --> Validation
+App --> Booking
+Validation --> Booking
+Validation --> Types
+Data --> Types
+List --> Types
+List --> Format
+Timeline --> Types
+Timeline --> Format
+Banner --> Types
+@enduml
