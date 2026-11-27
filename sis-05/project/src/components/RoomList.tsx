@@ -15,9 +15,8 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
       {rooms.map((room) => {
         const selected = room.id === selectedRoomId;
         return (
-          <button
+          <article
             key={room.id}
-            onClick={() => onSelect(room.id)}
             className={`text-left rounded-xl border p-4 transition-all duration-200 ${
               selected
                 ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-200'
@@ -26,7 +25,17 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
           >
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-slate-900">{room.name}</h3>
+                <h3 className="font-semibold text-slate-900">
+                  <button
+                    type="button"
+                    aria-label={`Select ${room.name}`}
+                    aria-pressed={selected}
+                    onClick={() => onSelect(room.id)}
+                    className="rounded text-left hover:underline focus-visible:outline-teal-600"
+                  >
+                    {room.name}
+                  </button>
+                </h3>
                 <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
                   <MapPin className="h-3.5 w-3.5" /> {room.building}
                 </p>
@@ -40,7 +49,9 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
                 {room.blocked ? 'Blocked' : 'Unblocked'}
               </span>
               <button
-                onClick={(e) => { e.stopPropagation(); onToggleBlocked(room.id); }}
+                type="button"
+                aria-pressed={room.blocked}
+                onClick={() => onToggleBlocked(room.id)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${room.blocked ? 'bg-red-400' : 'bg-emerald-400'}`}
                 aria-label={`Toggle blocked status for ${room.name}`}
               >
@@ -59,7 +70,7 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
                 </ul>
               </div>
             )}
-          </button>
+          </article>
         );
       })}
     </div>
