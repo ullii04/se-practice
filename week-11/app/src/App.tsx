@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Clock, CheckCircle2 } from 'lucide-react';
 import { rooms as sampleRooms } from '@/lib/sampleData';
+import { availabilityReason } from './booking';
+import ExplanationPanel from './components/ExplanationPanel';
+import type { ExplanationInput } from './explain';
 import { checkAvailability } from '@/lib/validation';
 import { minutesToLabel, CURRENT_TIME } from '@/lib/format';
 import type { AvailabilityResult } from '@/lib/types';
@@ -14,6 +17,13 @@ function App() {
   const [startStr, setStartStr] = useState('');
   const [endStr, setEndStr] = useState('');
   const [result, setResult] = useState<AvailabilityResult | null>(null);
+
+  const [explanationInput, setExplanationInput] = useState<ExplanationInput>();
+
+  function clearResult() {
+    setResult(null);
+    setExplanationInput(undefined);
+  }
 
   const selectedRoom = rooms.find((r) => r.id === selectedRoomId) ?? null;
 
@@ -30,6 +40,7 @@ function App() {
   const candidateEnd = endStr ? parseTimeToMinutes(endStr) : null;
 
   function handleCheck() {
+    setExplanationInput(undefined);
     if (!selectedRoom) {
       setResult({ available: false, reason: 'Please select a room.' });
       return;
@@ -40,20 +51,28 @@ function App() {
       setResult({ available: false, reason: 'Please enter valid times in HH:MM format.' });
       return;
     }
-    setResult(checkAvailability(selectedRoom, s, e, CURRENT_TIME));
+    const decision = checkAvailability(selectedRoom, s, e, CURRENT_TIME);
+    setResult(decision);
+    setExplanationInput({
+      roomLabel: selectedRoom.name, start: minutesToLabel(s), end: minutesToLabel(e),
+      isAvailable: decision.available,
+      reasonCode: availabilityReason({
+        start: s, end: e, now: CURRENT_TIME, blocked: selectedRoom.blocked, bookings: selectedRoom.bookings,
+      }),
+    });
   }
 
   function handleReset() {
     setStartStr('');
     setEndStr('');
-    setResult(null);
+    clearResult();
   }
 
   function toggleBlocked(roomId: string) {
     setRooms((prev) =>
       prev.map((r) => (r.id === roomId ? { ...r, blocked: !r.blocked } : r))
     );
-    setResult(null);
+    clearResult();
   }
 
   return (
@@ -79,7 +98,7 @@ function App() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
             Select a room
           </h2>
-          <RoomList rooms={rooms} selectedRoomId={selectedRoomId} onSelect={setSelectedRoomId} onToggleBlocked={toggleBlocked} />
+          <RoomList rooms={rooms} selectedRoomId={selectedRoomId} onSelect={(id) => { setSelectedRoomId(id); clearResult(); }} onToggleBlocked={toggleBlocked} />
         </section>
 
         {selectedRoom && (
@@ -96,7 +115,7 @@ function App() {
                   <input
                     type="time"
                     value={startStr}
-                    onChange={(e) => setStartStr(e.target.value)}
+                    onChange={(e) => { setStartStr(e.target.value); clearResult(); }}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
                     placeholder="HH:MM"
                   />
@@ -108,7 +127,7 @@ function App() {
                   <input
                     type="time"
                     value={endStr}
-                    onChange={(e) => setEndStr(e.target.value)}
+                    onChange={(e) => { setEndStr(e.target.value); clearResult(); }}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
                     placeholder="HH:MM"
                   />
@@ -142,6 +161,12 @@ function App() {
             />
 
             {result && <ResultBanner result={result} />}
+            {explanationInput && (
+              <ExplanationPanel
+                key={JSON.stringify(explanationInput)}
+                input={explanationInput}
+              />
+            )}
           </>
         )}
       </main>
