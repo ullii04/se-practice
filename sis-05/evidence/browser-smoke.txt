@@ -1,0 +1,5 @@
+Final Vite production build, local port 5180. Observed by Codex via the in-app browser.
+
+R1: Enter activated the independently named Select Amphitheatre button, then Tab focused Toggle blocked status for Amphitheatre. Space set its pressed state to true. Check returned Unavailable for 11:00–12:00 while blocked. Space unblocked the room, and a new check for the same interval returned Available.
+AC3: With Simulate API failure checked, Explain availability displayed Fallback explanation (local rules). The Available verdict remained visible.
+R2: After entering 12:30–12:00, Check returned Unavailable. The rendered timeline title values contained the existing 10:00–11:00 Demo booking and no candidate request title.

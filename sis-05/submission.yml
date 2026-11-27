@@ -1,0 +1,65 @@
+# sis-05/submission.yml — your declaration for this SIS.
+#
+# Facts only. Every explanation goes in report.md; nothing here repeats prose.
+# Fill every value. Check it before you push:
+#
+#     python tests/validate_submission.py
+#
+# The validator checks shape, never quality. A green run is the floor, not the grade.
+# If you cannot run Python, fill the file by hand against the comments — a malformed
+# file costs you nothing if the content is there.
+
+schema: 1
+assignment: "sis-05"            # do not edit
+
+student:
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  group: "Monday 16:00-19:00"
+  github: "ullii04"
+
+assistant:
+  tool: "Codex desktop"
+  model: "not displayed"
+
+project:
+  name: "Smart Campus Room Availability Checker"
+  language: typescript
+  origin: smart-campus
+  baseline_commit: "f875f00"
+
+counts:
+  findings: 7
+  risks: 7
+  risks_confirmed: 4
+  exchanges: 3
+
+decision:
+  pattern: not-warranted
+  level: 2
+  top_two: [R1, R2]
+  mitigated: [R1, R2]
+  release: conditional
+
+checker:
+  pass: 23
+  fail: 0
+  error: 0
+  commit: "1353064"
+  known_fails: []
+
+review_findings:
+  # Three or more. One line each, and each one names what it is about: a risk ID (R1...),
+  # an acceptance criterion (AC1-AC5), a readiness row (1a-3d), or a file.
+  # Worthless:        "The AI found some risks that were not real"
+  # Worth everything: "R1: splitter.py line 16 evals the shares field; test_R1 failed before the fix - confirmed"
+  - "R1 failed on nested controls. Both native controls are now independent and reachable by keyboard."
+  - "R2 failed on negative width. A reversed interval now leaves existing booking markers intact and has no candidate marker."
+  - "R4: the project has no tracked every-push checks. External CI configuration was not verified."
+
+honesty:
+  baseline_unchanged: yes
+  review_was_read_only: yes
+  runs_unedited: no
+  no_secrets_or_personal_data: no
+  ai_usage_disclosed: yes
