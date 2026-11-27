@@ -42,11 +42,11 @@ decision:
   release: conditional
 
 checker:
-  pass: 22
-  fail: 1
+  pass: 23
+  fail: 0
   error: 0
-  commit: "320c177"
-  known_fails: [L14]
+  commit: "1353064"
+  known_fails: []
 
 review_findings:
   # Three or more. One line each, and each one names what it is about: a risk ID (R1...),
