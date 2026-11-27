@@ -13,54 +13,53 @@ schema: 1
 assignment: "sis-05"            # do not edit
 
 student:
-  name:                         # as in the university register
-  student_id:                   # e.g. 00X000000
-  group:                        # your group code, as in the timetable
-  github:                       # username only, not a URL
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  group: "Monday 16:00-19:00"
+  github: "ullii04"
 
 assistant:
-  tool:                         # the assistant you worked with, e.g. ChatGPT (web), Claude Code, Bolt.new
-  model:                        # exactly as in report.md section 1, or: not displayed
+  tool: "Codex desktop"
+  model: "not displayed"
 
-project:                        # exactly as in report.md section 1
-  name:                         # the project's name
-  language:                     # its main language, e.g. python, typescript, java, go
-  origin:                       # own | smart-campus | other
-  baseline_commit:              # the commit that brought the project in unchanged
+project:
+  name: "Smart Campus Room Availability Checker"
+  language: typescript
+  origin: smart-campus
+  baseline_commit: "f875f00"
 
-counts:                         # the checker prints these under --json "measured"
-  findings:                     # complete rows in report.md 5.2
-  risks:                        # rows in the register, 6.1
-  risks_confirmed:              # of those, how many are confirmed
-  exchanges:                    # complete exchanges in report.md section 11
+counts:
+  findings: 7
+  risks: 7
+  risks_confirmed: 4
+  exchanges: 3
 
 decision:
-  pattern:                      # applied | not-warranted   from report.md 4.3
-  level:                        # 0 | 1 | 2 | 3   from report.md 7.2
-  top_two: []                   # the IDs from 6.2, highest first, e.g. [R1, R3]
-  mitigated: []                 # the two IDs of 8.1 and 8.2, e.g. [R1, R3]
-  release:                      # go | conditional | no-go
+  pattern: not-warranted
+  level: 2
+  top_two: [R1, R2]
+  mitigated: [R1, R2]
+  release: conditional
 
-checker:                        # from your LAST run of python tests/check_sis.py
-  pass:
-  fail:
-  error:
-  commit:                       # the commit you ran it at: git rev-parse --short HEAD
-                                # (normally the commit just before you commit this file — that is fine)
-  known_fails: []               # every check still FAIL or ERROR, as in report.md 11.4, e.g. [P6]
+checker:
+  pass: 22
+  fail: 1
+  error: 0
+  commit: "320c177"
+  known_fails: [L14]
 
 review_findings:
   # Three or more. One line each, and each one names what it is about: a risk ID (R1...),
   # an acceptance criterion (AC1-AC5), a readiness row (1a-3d), or a file.
   # Worthless:        "The AI found some risks that were not real"
   # Worth everything: "R1: splitter.py line 16 evals the shares field; test_R1 failed before the fix - confirmed"
-  -
-  -
-  -
+  - "R1 failed on nested controls. Both native controls are now independent and reachable by keyboard."
+  - "R2 failed on negative width. A reversed interval now leaves existing booking markers intact and has no candidate marker."
+  - "R4: the project has no tracked every-push checks. External CI configuration was not verified."
 
 honesty:
-  baseline_unchanged:           # yes | no   project/ at the baseline commit is the project as it was
-  review_was_read_only:         # yes | no   the Task 4 review modified nothing
-  runs_unedited:                # yes | no   every output in report.md is pasted from a real run
-  no_secrets_or_personal_data:  # yes | no   nothing real in sis-05/
-  ai_usage_disclosed:           # yes | no   AI_USAGE.md and section 11 are complete
+  baseline_unchanged: yes
+  review_was_read_only: yes
+  runs_unedited: no
+  no_secrets_or_personal_data: no
+  ai_usage_disclosed: yes
