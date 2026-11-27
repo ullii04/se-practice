@@ -1,0 +1,73 @@
+# week-11/submission.yml — your declaration for this lab.
+#
+# Facts only. Every explanation goes in lab-report.md; nothing here repeats prose.
+# Fill every value. Check it before you push:
+#
+#     python tests/validate_submission.py
+#
+# The validator checks shape, never quality. A green run is the floor, not the grade.
+# If you cannot run Python, fill the file by hand against the comments — a malformed
+# file costs you nothing if the content is there.
+
+schema: 1
+week: "11"
+
+student:
+  name: "Elshibai Ulzhalgas"
+  student_id: "24B031019"
+  github: "ullii04"
+
+assistant:
+  tool: "Codex desktop"
+  model: "not displayed"
+  environment: other
+
+reviewer:
+  tool: "Codex desktop"
+  model: "not displayed"
+  same_model_as_builder: yes
+
+project:
+  starting_point: week-10
+  baseline_commit: "893c3a6"
+  language: ts
+  vitest: "3.2.4"
+
+feature:
+  adapter: mock
+  timeout_ms: 750
+  prompt_chosen: B
+
+counts:
+  tests_baseline: 22
+  tests_final: 34
+  cases_run: 9
+  findings_verified: 6
+  findings_confirmed: 5
+
+decision:
+  fixed: [V1, V3]
+  demo_ready: yes
+
+checker:
+  pass: 27
+  fail: 0
+  error: 0
+  commit: "8290060"
+  known_fails: []
+
+review_findings:
+  # Three or more. One line each, and each one names what it is about: a finding ID (V1...),
+  # a test case (E1-E9), a criterion (F1-F5, AC1-AC6), a reason code, or a file.
+  # Worthless:        "The reviewer found some issues that were not real"
+  # Worth everything: "V3: the reviewer said roomLabel allows prompt injection; App.tsx takes it from a fixed list - unsupported"
+  - "V1 and V2 originally let contradictory or invented text pass. Complete approved sentences now control display."
+  - "V3 reproduced a malformed array reason and now rejects it before executing the adapter."
+  - "E8 returned the fallback at the configured fake deadline. On the page, simulated failure preserved Available."
+
+honesty:
+  changes_reviewed_by_me: no
+  no_key_in_browser: yes
+  review_was_read_only: yes
+  outputs_unedited: no
+  ai_usage_disclosed: yes
