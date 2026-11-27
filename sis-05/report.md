@@ -16,12 +16,12 @@ grader find your answers by them. You can add rows to any table, but never remov
 | Project (name, and what it does in one line) | Smart Campus Room Availability Checker. Check one fictional room and optionally explain the result. |
 | Language and stack | TypeScript, React, Vite, Vitest |
 | Where it comes from (my own / Smart Campus / other) | Smart Campus, from my Week 11 project at b53b507 |
-| Baseline commit — the project brought in unchanged | 05eb7cc |
+| Baseline commit — the project brought in unchanged | f875f00 |
 | Assistant (tool) | Codex desktop |
 | Exact model | not displayed |
 | Where I ran the commands | Local macOS terminal and Codex in-app browser |
 
-Local baseline 05eb7cc and the Week 11 application had identical project tree e73feda868d8f4a4282097f2e34d9cc84208123d.
+The local baseline 05eb7cc and published checkpoint f875f00 match the Week 11 application tree e73feda868d8f4a4282097f2e34d9cc84208123d.
 
 ## 2. Task 1 — baseline and context
 
@@ -111,7 +111,7 @@ Real baseline terminal output with the local checkout path redacted.
 
 ### 4.1 The maintainability problem
 
-The demo toggle updates blocked status in project/src/App.tsx:71–75, and project/src/booking.ts evaluates blocked status among the fixed booking rules. A future policy change could be assigned to the wrong layer unless those responsibilities are explicit.
+The proposed pattern decision is documented here for student review. The demo toggle updates blocked status in project/src/App.tsx:71–75, and project/src/booking.ts evaluates blocked status among the fixed booking rules. A future policy change could be assigned to the wrong layer unless those responsibilities are explicit.
 
 ### 4.2 The pattern I evaluated
 
@@ -175,7 +175,7 @@ npm notice
 
 ### 5.1 The review
 
-A separate Codex reviewer received pasted excerpts from the committed project and instructions. It was instructed to use no tools and reported no filesystem access or edits. Its session was not technically write-disabled. Comparing git status around the review showed a clean checkout.
+The student wrote the review prompt. A separate Codex reviewer received pasted excerpts from the committed project and instructions. It was instructed to use no tools and reported no filesystem access or edits. Its session was not technically write-disabled. Comparing git status around the review showed a clean checkout.
 
 What you sent, exactly:
 
@@ -214,6 +214,8 @@ I did not access the filesystem, change any files, run commands or tests, inspec
 | 7 | No configured dependency audit command | dependency | project/package.json and package-lock.json | confirmed | The lockfile pins the dependencies. The script list includes no audit script. No package vulnerability was asserted. |
 
 ## 6. Task 5 — risk register
+
+The following labels and ratings are the AI-assisted evidence assessment. Independent student acceptance has not been recorded.
 
 ### 6.1 The register
 
@@ -262,64 +264,322 @@ Level 1 has 4/4 and Level 2 has 3/3. Level 3 has 3/4, or 75%. Row 3a needs a tra
 
 ### 8.1 The first mitigation
 
-**Risk:** R?
+**Risk:** R1
 
-**What I changed, and what I rejected from the assistant's proposal:**
+**What I changed, and what I rejected from the assistant's proposal:** Codex changed the room card to an article with independent native selection and block controls. It retained the stable block label and added pressed states. It excluded the proposed different-room test because the application has one room. Before applying the patch, Codex compared the component diff and reproduced the invalid nesting in the isolated copy.
 
-The test that fails before the fix (or why a test is not feasible):
+The test that fails before the fix:
 
 ```text
-(paste here)
+> vite-react-typescript-starter@0.0.0 test
+> vitest run -t R1:
+
+
+ RUN  v3.2.4 [local path]/sis-05/project
+
+ ↓ src/booking.test.ts (22 tests | 22 skipped)
+ ↓ src/explain.test.ts (12 tests | 12 skipped)
+ ❯ src/ui-risk.test.tsx (1 test | 1 failed) 6ms
+   × R1: selection and blocked controls are not nested buttons 5ms
+     → expected '<div class="grid gap-3 sm:grid-cols-2…' not to match /<button\b[^>]*>(?…/button>).)*<button\b
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/ui-risk.test.tsx > R1: selection and blocked controls are not nested buttons
+AssertionError: expected '<div class="grid gap-3 sm:grid-cols-2…' not to match /<button\b[^>]*>(?…/button>).)*<button\b
+
+- Expected: 
+/<button\b[^>]*>(?:(?!<\/button>).)*<button\b/s
+
++ Received: 
+"<div class=\"grid gap-3 sm:grid-cols-2 lg:grid-cols-3\"><button class=\"text-left rounded-xl border p-4 transition-all duration-200 border-teal-500 bg-teal-50 ring-2 ring-teal-200\"><div class=\"flex items-start justify-between\"><div><h3 class=\"font-semibold text-slate-900\">Demo Room</h3><p class=\"mt-1 flex items-center gap-1 text-sm text-slate-500\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-map-pin h-3.5 w-3.5\"><path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\"></path><circle cx=\"12\" cy=\"10\" r=\"3\"></circle></svg> Demo Building</p></div></div><div class=\"mt-3 flex items-center gap-1.5 text-sm text-slate-600\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-users h-3.5 w-3.5\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"></path><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"></path></svg> 12 seats</div><div class=\"mt-3 flex items-center justify-between border-t border-slate-100 pt-2\"><span class=\"text-xs font-medium text-emerald-600\">Unblocked</span><button class=\"relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-emerald-400\" aria-label=\"Toggle blocked status for Demo Room\"><span class=\"inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform translate-x-0.5\"></span></button></div><div class=\"mt-3 border-t border-slate-100 pt-2\"><p class=\"text-xs font-medium text-slate-400\">Bookings</p><ul class=\"mt-1 space-y-0.5\"><li class=\"text-xs text-slate-500\">10:00 – 11:00 · Demo booking</li></ul></div></button></div>"
+
+ ❯ src/ui-risk.test.tsx:22:22
+     20|   expect(markup.match(/<button\b/g)).toHaveLength(2);
+     21|   expect(markup).toContain('Toggle blocked status for Demo Room');
+     22|   expect(markup).not.toMatch(/<button\b[^>]*>(?:(?!<\/button>).)*<butt…
+       |                      ^
+     23| });
+     24| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 skipped (3)
+      Tests  1 failed | 34 skipped (35)
+   Start at  03:47:28
+   Duration  254ms (transform 60ms, setup 0ms, collect 124ms, tests 6ms, environment 0ms, prepare 101ms)
 ```
 
-The diff (`git diff`):
+The diff (git diff):
 
-```text
-(paste here)
+```diff
+diff --git a/sis-05/project/src/components/RoomList.tsx b/sis-05/project/src/components/RoomList.tsx
+index 0e3e371..06eb2c3 100644
+--- a/sis-05/project/src/components/RoomList.tsx
++++ b/sis-05/project/src/components/RoomList.tsx
+@@ -15,9 +15,8 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
+       {rooms.map((room) => {
+         const selected = room.id === selectedRoomId;
+         return (
+-          <button
++          <article
+             key={room.id}
+-            onClick={() => onSelect(room.id)}
+             className={`text-left rounded-xl border p-4 transition-all duration-200 ${
+               selected
+                 ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-200'
+@@ -26,7 +25,17 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
+           >
+             <div className="flex items-start justify-between">
+               <div>
+-                <h3 className="font-semibold text-slate-900">{room.name}</h3>
++                <h3 className="font-semibold text-slate-900">
++                  <button
++                    type="button"
++                    aria-label={`Select ${room.name}`}
++                    aria-pressed={selected}
++                    onClick={() => onSelect(room.id)}
++                    className="rounded text-left hover:underline focus-visible:outline-teal-600"
++                  >
++                    {room.name}
++                  </button>
++                </h3>
+                 <p className="mt-1 flex items-center gap-1 text-sm text-slate-500">
+                   <MapPin className="h-3.5 w-3.5" /> {room.building}
+                 </p>
+@@ -40,7 +49,9 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
+                 {room.blocked ? 'Blocked' : 'Unblocked'}
+               </span>
+               <button
+-                onClick={(e) => { e.stopPropagation(); onToggleBlocked(room.id); }}
++                type="button"
++                aria-pressed={room.blocked}
++                onClick={() => onToggleBlocked(room.id)}
+                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${room.blocked ? 'bg-red-400' : 'bg-emerald-400'}`}
+                 aria-label={`Toggle blocked status for ${room.name}`}
+               >
+@@ -59,7 +70,7 @@ export default function RoomList({ rooms, selectedRoomId, onSelect, onToggleBloc
+                 </ul>
+               </div>
+             )}
+-          </button>
++          </article>
+         );
+       })}
+     </div>
+diff --git a/sis-05/project/src/ui-risk.test.tsx b/sis-05/project/src/ui-risk.test.tsx
+new file mode 100644
+index 0000000..b44bb05
+--- /dev/null
++++ b/sis-05/project/src/ui-risk.test.tsx
+@@ -0,0 +1,23 @@
++import { renderToStaticMarkup } from 'react-dom/server';
++import { expect, test } from 'vitest';
++import RoomList from './components/RoomList';
++import type { Room } from './lib/types';
++
++const room: Room = {
++  id: 'demo',
++  name: 'Demo Room',
++  building: 'Demo Building',
++  capacity: 12,
++  blocked: false,
++  bookings: [{ id: 'b1', start: 600, end: 660, bookedBy: 'Demo booking' }],
++};
++
++test('R1: selection and blocked controls are not nested buttons', () => {
++  const markup = renderToStaticMarkup(
++    <RoomList rooms={[room]} selectedRoomId={room.id} onSelect={() => {}} onToggleBlocked={() => {}} />,
++  );
++
++  expect(markup.match(/<button\b/g)).toHaveLength(2);
++  expect(markup).toContain('Toggle blocked status for Demo Room');
++  expect(markup).not.toMatch(/<button\b[^>]*>(?:(?!<\/button>).)*<button\b/s);
++});
 ```
 
 ### 8.2 The second mitigation
 
-**Risk:** R?
+**Risk:** R2
 
-**What I changed, and what I rejected from the assistant's proposal:**
+**What I changed, and what I rejected from the assistant's proposal:** Codex restricted the candidate drawing to ordered, non-null endpoints. It excluded a broader booking-rule refactor and kept rejected slots, existing bookings and endpoint semantics unchanged. It extended the regression to cover equal and missing endpoints and a valid zero-minute start.
 
-The test that fails before the fix (or why a test is not feasible):
+The test that fails before the fix:
 
 ```text
-(paste here)
+> vite-react-typescript-starter@0.0.0 test
+> vitest run -t R2:
+
+
+ RUN  v3.2.4 [local path]/sis-05/project
+
+ ↓ src/booking.test.ts (22 tests | 22 skipped)
+ ↓ src/explain.test.ts (12 tests | 12 skipped)
+ ❯ src/ui-risk.test.tsx (2 tests | 1 failed | 1 skipped) 6ms
+   ↓ R1: selection and blocked controls are not nested buttons
+   × R2: a reversed interval renders no candidate timeline block 6ms
+     → expected '<div class="rounded-xl border border-…' not to contain 'width:-'
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/ui-risk.test.tsx > R2: a reversed interval renders no candidate timeline block
+AssertionError: expected '<div class="rounded-xl border border-…' not to contain 'width:-'
+
+Expected: "width:-"
+Received: "<div class="rounded-xl border border-slate-200 bg-white p-4"><h3 class="text-sm font-semibold text-slate-700">Daily timeline — Demo Room</h3><div class="mt-3"><div class="relative h-10 overflow-hidden rounded-lg bg-slate-100"><div class="absolute top-0 h-full bg-slate-400 flex items-center justify-center text-[10px] font-medium text-white" style="left:41.66666666666667%;width:4.166666666666666%" title="10:00–11:00 Demo booking">10:00</div><div class="absolute top-0 h-full bg-amber-400 flex items-center justify-center text-[10px] font-medium text-white" style="left:52.083333333333336%;width:-2.083333333333333%" title="12:30–12:00 Your request"></div></div><div class="relative mt-1 h-4 text-[9px] text-slate-400"><span class="absolute -translate-x-1/2" style="left:0%">00:00</span><span class="absolute -translate-x-1/2" style="left:25%">06:00</span><span class="absolute -translate-x-1/2" style="left:50%">12:00</span><span class="absolute -translate-x-1/2" style="left:75%">18:00</span><span class="absolute -translate-x-1/2" style="left:100%">24:00</span></div></div><div class="mt-2 flex items-center gap-4 text-xs text-slate-500"><span class="flex items-center gap-1.5"><span class="inline-block h-2.5 w-2.5 rounded-sm bg-slate-400"></span> Existing booking</span><span class="flex items-center gap-1.5"><span class="inline-block h-2.5 w-2.5 rounded-sm bg-amber-400"></span> Your request</span></div></div>"
+
+ ❯ src/ui-risk.test.tsx:44:24
+     42|   );
+     43| 
+     44|   expect(reversed).not.toContain('width:-');
+       |                        ^
+     45|   expect(reversed).not.toContain('12:30–12:00 Your request');
+     46|   expect(equal).not.toContain('12:00–12:00 Your request');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 skipped (3)
+      Tests  1 failed | 35 skipped (36)
+   Start at  03:47:47
+   Duration  367ms (transform 66ms, setup 0ms, collect 139ms, tests 6ms, environment 0ms, prepare 97ms)
 ```
 
-The diff (`git diff`):
+The diff (git diff):
 
-```text
-(paste here)
+```diff
+diff --git a/sis-05/project/src/components/Timeline.tsx b/sis-05/project/src/components/Timeline.tsx
+index f6d1fa6..7e7ef28 100644
+--- a/sis-05/project/src/components/Timeline.tsx
++++ b/sis-05/project/src/components/Timeline.tsx
+@@ -10,7 +10,7 @@ interface Props {
+ 
+ export default function Timeline({ room, candidateStart, candidateEnd, available }: Props) {
+   const blocks: (Room['bookings'][number] & { kind: 'booked' | 'candidate' })[] = [...room.bookings.map((b) => ({ ...b, kind: 'booked' as const }))];
+-  if (candidateStart !== null && candidateEnd !== null) {
++  if (candidateStart !== null && candidateEnd !== null && candidateStart < candidateEnd) {
+     blocks.push({
+       id: 'candidate',
+       start: candidateStart,
+diff --git a/sis-05/project/src/ui-risk.test.tsx b/sis-05/project/src/ui-risk.test.tsx
+index b44bb05..da1df67 100644
+--- a/sis-05/project/src/ui-risk.test.tsx
++++ b/sis-05/project/src/ui-risk.test.tsx
+@@ -1,6 +1,7 @@
+ import { renderToStaticMarkup } from 'react-dom/server';
+ import { expect, test } from 'vitest';
+ import RoomList from './components/RoomList';
++import Timeline from './components/Timeline';
+ import type { Room } from './lib/types';
+ 
+ const room: Room = {
+@@ -21,3 +22,30 @@ test('R1: selection and blocked controls are not nested buttons', () => {
+   expect(markup).toContain('Toggle blocked status for Demo Room');
+   expect(markup).not.toMatch(/<button\b[^>]*>(?:(?!<\/button>).)*<button\b/s);
+ });
++
++test('R2: a reversed interval renders no candidate timeline block', () => {
++  const reversed = renderToStaticMarkup(
++    <Timeline room={room} candidateStart={750} candidateEnd={720} available={false} />,
++  );
++  const valid = renderToStaticMarkup(
++    <Timeline room={room} candidateStart={660} candidateEnd={720} available={true} />,
++  );
++
++  const equal = renderToStaticMarkup(
++    <Timeline room={room} candidateStart={720} candidateEnd={720} available={false} />,
++  );
++  const missing = renderToStaticMarkup(
++    <Timeline room={room} candidateStart={null} candidateEnd={720} available={null} />,
++  );
++  const midnight = renderToStaticMarkup(
++    <Timeline room={room} candidateStart={0} candidateEnd={30} available={false} />,
++  );
++
++  expect(reversed).not.toContain('width:-');
++  expect(reversed).not.toContain('12:30–12:00 Your request');
++  expect(equal).not.toContain('12:00–12:00 Your request');
++  expect(missing).not.toContain('Your request"');
++  expect(valid).toContain('11:00–12:00 Your request');
++  expect(midnight).toContain('00:00–00:30 Your request');
++  expect(reversed).toContain('10:00–11:00 Demo booking');
++});
 ```
 
 ### 8.3 The final checks
 
-The real output of the final test run (and any other check you ran):
+Real final run with the local absolute checkout path redacted. R1 and R2 each failed before its own patch, and both passed after the repairs.
 
 ```text
-(paste here)
+> vite-react-typescript-starter@0.0.0 test
+> vitest run
+
+
+ RUN  v3.2.4 [local path]/sis-05/project
+
+ ✓ src/booking.test.ts (22 tests) 2ms
+ ✓ src/explain.test.ts (12 tests) 4ms
+ ✓ src/ui-risk.test.tsx (2 tests) 4ms
+
+ Test Files  3 passed (3)
+      Tests  36 passed (36)
+   Start at  03:47:48
+   Duration  253ms (transform 62ms, setup 0ms, collect 134ms, tests 11ms, environment 0ms, prepare 85ms)
+
+
+> vite-react-typescript-starter@0.0.0 lint
+> eslint .
+
+
+> vite-react-typescript-starter@0.0.0 typecheck
+> tsc --noEmit -p tsconfig.app.json
+
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
+
+> vite-react-typescript-starter@0.0.0 build
+> vite build
+
+vite v5.4.8 building for production...
+transforming...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 1577 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.70 kB │ gzip:  0.38 kB
+dist/assets/index-bjL-l-QD.css   13.72 kB │ gzip:  3.21 kB
+dist/assets/index-D97wlRj6.js   158.39 kB │ gzip: 50.70 kB
+✓ built in 774ms
+npm notice
+npm notice New minor version of npm available! 11.8.0 -> 11.21.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.3
+npm notice To update run: npm install -g npm@11.21.3
+npm notice
 ```
 
 Tests and checks I did not run, and why:
 
-<!-- Write below this line. "None" only if it is true. -->
+- Dependency advisory scan: the project has no configured audit step and the run used the local npm cache.
+- External CI and repository merge settings: the workflow audit was limited to tracked repository files.
+- A deployed app, live adapter, an empty fixture, other browser engines or assistive-reader software: the scope was the one-room local mock, the existing fixture and the in-app browser.
+- Browser smoke evidence is in evidence/browser-smoke.txt. It is an observation summary, not pasted terminal output.
 
 ### 8.4 Updated scores and what remains
 
 | ID | L before | I before | Score before | L after | I after | Score after | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | | |
-| | | | | | | | |
+| R1 | 2 | 2 | 4 | 1 | 2 | 2 | R1 now passes. Keyboard Tab reached the block control after room selection, and toggling changed the booking result as expected. |
+| R2 | 2 | 1 | 2 | 1 | 1 | 1 | R2 now passes. Reversing 12:30–12:00 kept the booking visible without a candidate block. |
 
 **Remaining limitations and trade-offs:**
 
-<!-- Write below this line -->
-
----
+A single browser smoke test and static markup assertions do not establish behavior on every assistive technology. The UI still cannot enter 24:00 (R3). Configuration for every-push CI and dependency audits remains outside the mitigations (R4, R5).
 
 ## 9. Tasks 8–9 — background-agent safeguards and the release decision
 
@@ -338,31 +598,17 @@ Tests and checks I did not run, and why:
 
 ### 9.2 Release decision
 
-**Decision:** GO / CONDITIONAL / NO-GO
-
-<!-- Keep one word above. GO is not allowed while any confirmed risk still scores 6 or more.
-     Then 80-150 words: the test evidence, the register, the readiness level. Name at least two
-     risk IDs. -->
+**Decision:** CONDITIONAL
 
 <!-- Write your justification below this line -->
 
----
+This is the assistant’s recommendation for a local demonstration, pending the student's release decision. The two regressions now pass within the 36-test suite, and lint, type checking and the build succeeded. R1 separates the controls so keyboard users can reach them independently. R2 removes reversed-slot bars while keeping the original rejection. The project reaches Level 2. R4 remains open because every-push checks are not in the tracked repository, and R5 remains open because there is no configured advisory check. The student maintainer should attach local results to every change and have a human review them before any merge. Keep the demo on fictional data with the local mock.
 
 ## 10. AI reflection
 
-<!-- 200-300 words, in your own words, without the assistant. Answer all four:
-     1. Which assistant and model did you use, and what context did it receive?
-     2. One useful AI suggestion, and one inaccurate, weak or unverified one.
-     3. What did you personally check, and how did the tests change your decisions?
-     4. Did AGENTS.md improve the process? What should improve next?
-     Worthless: "The AI was very helpful and saved me a lot of time."
-     Worth everything: "Claude (claude-sonnet-5-5) got the README, AGENTS.md and the diff. Its R1,
-     eval on the shares field, was right: test_R1 failed before the fix. Its claim that the tests
-     were flaky was unsupported: ten runs, ten passes." -->
-
 <!-- Write your reflection below this line -->
 
----
+Pending the student’s own reflection.
 
 ## 11. AI evidence appendix
 
@@ -408,4 +654,4 @@ At least **three** complete exchanges.
 
 | Check | Why it stays |
 | --- | --- |
-| none | No retained checker failures. The reviewer followed a no-tools instruction. Session permissions were not technically write-disabled. |
+| L14 | The assignment requires a 200–300 word student-authored reflection. It has not been supplied, so this section intentionally records the gap. |
