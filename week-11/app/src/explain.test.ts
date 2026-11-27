@@ -83,3 +83,25 @@ describe('Explain availability', () => {
     expect(result.explanation).toMatch(/unavailable.*overlaps/);
   });
 });
+
+test('V1 F2: contradictory output cannot override the explanation verdict', async () => {
+  const result = await explainAvailability(input({ start: 630, end: 690 }), async () => ({
+    explanation: 'The room is available. Another room is unavailable.',
+  }));
+  expect(result.source).toBe('fallback');
+  expect(result.explanation).toContain('overlaps');
+});
+
+test('V2 F2: a wrong reason or an invented time uses the overlap fallback', async () => {
+  const request = input({ start: 630, end: 690 });
+  for (const explanation of [
+    'The room is unavailable because it is blocked.',
+    'The room is unavailable because it overlaps an existing booking until 9 pm.',
+  ]) {
+    const result = await explainAvailability(request, async () => ({ explanation }));
+    expect(result).toEqual({
+      source: 'fallback',
+      explanation: 'The room is unavailable because the requested time overlaps an existing booking.',
+    });
+  }
+});

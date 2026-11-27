@@ -56,14 +56,11 @@ function validatedOutput(output: unknown, input: ExplanationInput): string | und
   if (!output || typeof output !== 'object' || !('explanation' in output) ||
       typeof output.explanation !== 'string') return undefined;
   const text = output.explanation.trim();
-  if (!text || text.length > 280 || text.split(/[.!?]+/).filter((part) => part.trim()).length > 2) {
-    return undefined;
-  }
-  const saysAvailable = /\bavailable\b/i.test(text);
-  const saysUnavailable = /\bunavailable\b|\bnot available\b/i.test(text);
-  const disagrees = input.isAvailable ? !saysAvailable || saysUnavailable : !saysUnavailable;
-  const times = text.match(/\b\d{1,2}:\d{2}\b/g) ?? [];
-  return disagrees || times.some((time) => time !== input.start && time !== input.end) ? undefined : text;
+  const alternate = input.isAvailable
+    ? `The requested slot from ${input.start} to ${input.end} is available.`
+    : `The requested slot from ${input.start} to ${input.end} is unavailable because ${reasons[input.reasonCode]}.`;
+  // Approved sentences enforce the verdict and reason without trusting free-form prose.
+  return text === fallback(input) || text === alternate ? text : undefined;
 }
 
 export const mockAdapter: ExplanationAdapter = async (input) => ({
