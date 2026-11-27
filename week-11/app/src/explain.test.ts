@@ -105,3 +105,12 @@ test('V2 F2: a wrong reason or an invented time uses the overlap fallback', asyn
     });
   }
 });
+
+test('V3 F3: rejects an array masquerading as a reason code before calling the adapter', async () => {
+  let invoked = false;
+  const malformed = { ...input({ start: 630, end: 690 }), reasonCode: ['overlap'] };
+  await expect(explainAvailability(malformed as unknown as ExplanationInput, async () => {
+    invoked = true;
+  })).rejects.toThrow('availability verdict and reason');
+  expect(invoked).toBe(false);
+});

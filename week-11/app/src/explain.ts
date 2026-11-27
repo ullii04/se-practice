@@ -35,7 +35,8 @@ function validatedInput(input: ExplanationInput): ExplanationInput {
       !timePattern.test(input.start) || !timePattern.test(input.end)) {
     throw new Error('Times must use HH:MM.');
   }
-  if (!Object.prototype.hasOwnProperty.call(reasons, input.reasonCode) || typeof input.isAvailable !== 'boolean' ||
+  if (typeof input.reasonCode !== 'string' || !Object.prototype.hasOwnProperty.call(reasons, input.reasonCode) ||
+      typeof input.isAvailable !== 'boolean' ||
       input.isAvailable !== (input.reasonCode === 'available')) {
     throw new Error('The availability verdict and reason must agree.');
   }
