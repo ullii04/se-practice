@@ -111,7 +111,7 @@ Real baseline terminal output with the local checkout path redacted.
 
 ### 4.1 The maintainability problem
 
-The proposed pattern decision is documented here for student review. The demo toggle updates blocked status in project/src/App.tsx:71–75, and project/src/booking.ts evaluates blocked status among the fixed booking rules. A future policy change could be assigned to the wrong layer unless those responsibilities are explicit.
+The demo toggle updates blocked status in project/src/App.tsx:71–75, and project/src/booking.ts evaluates blocked status among the fixed booking rules. A future policy change could be assigned to the wrong layer unless those responsibilities are explicit.
 
 ### 4.2 The pattern I evaluated
 
@@ -120,6 +120,8 @@ I evaluated Strategy as an interchangeable booking policy interface. It would be
 ### 4.3 My decision, before and after
 
 **Decision:** not warranted
+
+> I agree with not introducing the Strategy pattern because the current project does not require multiple interchangeable algorithms, and introducing it would add unnecessary complexity.
 
 Before and after, App owns the blocked demo state, booking.ts evaluates the existing policy, and the explanation adapter consumes the verdict. Adding a Strategy for a single policy would introduce an interface and dispatch without a second policy. The decision adds no application code.
 
@@ -215,7 +217,9 @@ I did not access the filesystem, change any files, run commands or tests, inspec
 
 ## 6. Task 5 — risk register
 
-The following labels and ratings are the AI-assisted evidence assessment. Independent student acceptance has not been recorded.
+The following labels and ratings are the AI-assisted evidence assessment. The student confirmed the priority of R1 and R2 and supplied this judgment:
+
+> I agree with prioritizing R1 and R2 because both risks affect the correctness and reliability of the application. R1 concerns invalid button nesting, while R2 concerns incorrect timeline rendering for reversed time intervals. Risk labels should be supported by actual evidence, and risk scores should be calculated consistently using likelihood and impact. Unverified assumptions should not be presented as confirmed findings.
 
 ### 6.1 The register
 
@@ -265,6 +269,10 @@ Level 1 has 4/4 and Level 2 has 3/3. Level 3 has 3/4, or 75%. Row 3a needs a tra
 ### 8.1 The first mitigation
 
 **Risk:** R1
+
+**Student approval after reviewing the patch:** APPROVED
+
+> The patch removes invalid nested buttons while preserving the intended functionality. The regression test confirms that the reported issue has been resolved. No unnecessary architectural changes are introduced.
 
 **What I changed, and what I rejected from the assistant's proposal:** Codex changed the room card to an article with independent native selection and block controls. It retained the stable block label and added pressed states. It excluded the proposed different-room test because the application has one room. Before applying the patch, Codex compared the component diff and reproduced the invalid nesting in the isolated copy.
 
@@ -402,6 +410,10 @@ index 0000000..b44bb05
 ### 8.2 The second mitigation
 
 **Risk:** R2
+
+**Student approval after reviewing the patch:** APPROVED
+
+> The patch prevents reversed time intervals from producing negative timeline widths. The regression test confirms that the issue has been resolved without breaking existing tested functionality.
 
 **What I changed, and what I rejected from the assistant's proposal:** Codex restricted the candidate drawing to ordered, non-null endpoints. It excluded a broader booking-rule refactor and kept rejected slots, existing bookings and endpoint semantics unchanged. It extended the regression to cover equal and missing endpoints and a valid zero-minute start.
 
@@ -602,13 +614,23 @@ A single browser smoke test and static markup assertions do not establish behavi
 
 <!-- Write your justification below this line -->
 
-This is the assistant’s recommendation for a local demonstration, pending the student's release decision. The two regressions now pass within the 36-test suite, and lint, type checking and the build succeeded. R1 separates the controls so keyboard users can reach them independently. R2 removes reversed-slot bars while keeping the original rejection. The project reaches Level 2. R4 remains open because every-push checks are not in the tracked repository, and R5 remains open because there is no configured advisory check. The student maintainer should attach local results to every change and have a human review them before any merge. Keep the demo on fictional data with the local mock.
+I approve the current version for local demonstration only. The two priority risks, R1 (nested buttons) and R2 (negative timeline width caused by reversed time intervals), have been addressed according to the reported regression test results. All 36 tests passed, which provides evidence that the fixes are effective and existing tested functionality remains stable.
+
+However, the project is currently at Readiness Level 2 and lacks automated CI checks on every push. Therefore, unrestricted deployment and automatic merging should not be approved.
+
+Before merging, the project owner must review both patches, verify the complete test results, and confirm that the production build succeeds. Full release approval should only be granted after these conditions are satisfied.
 
 ## 10. AI reflection
 
 <!-- Write your reflection below this line -->
 
-Pending the student’s own reflection.
+During this assignment, I provided the AI with information about the Smart Campus project, including relevant code snippets, project structure, and existing functionality. I used a read-only review prompt and clearly instructed the AI not to modify any files, execute unsafe commands, or invent test results. The main purpose was to identify potential risks and improve software quality.
+
+One useful suggestion was the identification of nested buttons in R1. This issue could cause invalid HTML structure and unexpected user interactions. Another important finding was R2, where a reversed time interval could produce a negative timeline width. However, the suggestion to test switching between different rooms was not applicable because the current demonstration contains only one room. This shows that AI recommendations must be evaluated within the actual project context.
+
+I reviewed the relevant code changes, patch differences, and test logs. The logs showed that two regression tests failed before the fixes and passed afterward. The final results reported 36 passing tests. This evidence increased my confidence in the proposed fixes and demonstrated the importance of verifying AI-generated recommendations instead of accepting them automatically.
+
+The `AGENTS.md` file provides instructions, safe commands, and operational boundaries for AI agents. It also helps ensure that important changes require human approval. However, the project still lacks continuous integration that automatically runs checks after every push. My next improvement would be to introduce CI and require successful tests and build verification before merging. Overall, AI was useful for identifying risks, but human judgment and evidence remained essential.
 
 ## 11. AI evidence appendix
 
@@ -654,4 +676,4 @@ At least **three** complete exchanges.
 
 | Check | Why it stays |
 | --- | --- |
-| L14 | The assignment requires a 200–300 word student-authored reflection. It has not been supplied, so this section intentionally records the gap. |
+| None | All checker checks passed. |

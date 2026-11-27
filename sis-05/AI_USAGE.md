@@ -1,6 +1,6 @@
 # SIS 05 AI usage disclosure
 
-Course AI-use level D. The student supplied the read-only review prompt and authorized the course identity fields. Student approval of each risk label, the mitigation diffs and the release recommendation is unverified. The student-authored reflection remains pending.
+Course AI-use level D. The student supplied the read-only review prompt and authorized the course identity fields. The student supplied the reflection and local-demonstration release decision, confirmed the R1/R2 priority and no-Strategy decision, and approved both patches after reviewing them. Codex assisted with the detailed risk labels and scores.
 
 | Tool | Model | Work |
 | --- | --- | --- |
@@ -8,4 +8,4 @@ Course AI-use level D. The student supplied the read-only review prompt and auth
 | Codex desktop adviser | not displayed | Proposed playbook topics, assessed Strategy, and reviewed the two component patches. |
 | Codex desktop separate reviewer | not displayed | Received only pasted excerpts, made no repository edits and ran no tools. The reviewer was instructed to read only; its permissions were not technically write-disabled. |
 
-The evidence appendix records these exchanges. Terminal logs came from the actual executions with local absolute paths redacted. Browser evidence was collected by Codex. The test and checker results do not imply independent student verification. The repository contains fictional fixtures. The only real identity fields are the course-required identification in the report and declaration, included with the student's approval.
+The evidence appendix records these exchanges. Terminal logs came from the actual executions with local absolute paths redacted. Browser evidence was collected by Codex. Codex executed the tests and checker. The student reviewed the patch differences and logs. The repository contains fictional fixtures. The only real identity fields are the course-required identification in the report and declaration, included with the student's approval.
