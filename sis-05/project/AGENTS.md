@@ -1,39 +1,39 @@
-# AGENTS.md — Smart Campus Room Availability Checker
+# Smart Campus project instructions
 
-Instructions for any coding agent working in this project. Read this file before you change
-anything, and follow it over any general habit of yours.
+## Purpose
 
-## Project
+Maintain the one-room fictional availability demo. Preserve the deterministic verdict and keep the mock explanation separate.
 
-A React + TypeScript page (Vite) that tells a student whether a campus room is free for a
-requested time. The booking rule lives in `src/booking.ts` (`canBook`); the page is `src/App.tsx`;
-the tests are in `src/booking.test.ts`.
+## Architecture
 
-Use one fictional room and fictional timetable data only.
+- `src/main.tsx` mounts `src/App.tsx`, which owns form and demo room state.
+- `src/booking.ts` decides availability. `src/lib/validation.ts` adapts the result for the UI.
+- `src/explain.ts` validates explanation inputs and outputs, runs the local mock, and provides the fallback.
+- `src/components/` renders controls, bookings, timeline, verdict and explanation. `src/lib/sampleData.ts` holds the fixture.
 
-## Acceptance contract
+## Setup
 
-- AC1 Reject start ≥ end and requests in the past.
-- AC2 Enforce the maximum allowed duration (120 minutes).
-- AC3 Reject a blocked room.
-- AC4 Reject overlaps. Allow requests that only touch an existing booking at an endpoint.
-- AC5 Return Available / Unavailable without changing booking data.
-- AC6 Preserve clear UI feedback on desktop and mobile.
+Use Node.js 24 and npm. Run `npm ci` from this directory, then `npm run dev` and open the loopback URL printed by Vite.
 
-## Commands
+## Safe commands
 
-- Install: `npm install`
-- Dev server: `npm run dev`
-- Tests: `npm test`
-- Build: `npm run build`
+- Install the lockfile dependencies with `npm ci`.
+- Run tests with `npm test`.
+- Check lint with `npm run lint` and types with `npm run typecheck`.
+- Build locally with `npm run build`.
+- Start the local demo with `npm run dev`.
 
-## You may
+## Coding conventions
 
-- Edit any file in the project.
-- Add packages when a task needs them.
-- Do not add a login or database. Do not use or commit secrets or credentials.
+Use typed, pure booking rules and explicit UI state. Keep changes focused and preserve the 120-minute maximum, endpoint-touching behavior, and unchanged fixtures during checks. Use fictional data and the local mock.
 
-## Before you finish
+## Test expectations
 
-- Run the tests before proposing acceptance, and verify that the page still loads.
-- Do not deploy or publish the app externally.
+Run tests, lint, type checking and build before requesting review. For a bug fix, add a focused regression and retain the existing suite. Attach the diff and verification results. Obtain human approval before merging.
+
+## Forbidden actions
+
+- Never commit secrets, credentials, or personal data.
+- Do not deploy to production or publish the demo externally.
+- Do not run destructive commands or rewrite Git history.
+- Do not change dependencies or the lockfile without human review.
