@@ -10,7 +10,7 @@ interface Props {
 
 export default function Timeline({ room, candidateStart, candidateEnd, available }: Props) {
   const blocks: (Room['bookings'][number] & { kind: 'booked' | 'candidate' })[] = [...room.bookings.map((b) => ({ ...b, kind: 'booked' as const }))];
-  if (candidateStart !== null && candidateEnd !== null) {
+  if (candidateStart !== null && candidateEnd !== null && candidateStart < candidateEnd) {
     blocks.push({
       id: 'candidate',
       start: candidateStart,
