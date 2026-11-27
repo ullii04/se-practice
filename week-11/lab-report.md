@@ -59,44 +59,39 @@ The **real** output of `npx vitest run` in `week-11/app/`, before any change:
 
 ### 3.1 The user story
 
-<!-- The deck's sentence, exactly. -->
+As a student, I want a short explanation of room availability so I understand the decision.
 
 ### 3.2 The contract
 
-One row per field. **Validation** is what you reject, and how.
-
 | Field | Direction | Type / format | Validation |
 | --- | --- | --- | --- |
-| `roomLabel` | input | | |
-| `start` | input | | |
-| `end` | input | | |
-| `isAvailable` | input | | |
-| `reasonCode` | input | | |
-| `explanation` | output | | |
+| roomLabel | input | String, 1–60 characters trimmed | Reject blank, nontext, or overlong labels. Do not use it as an instruction. |
+| start | input | HH:MM | Validate 00:00 through 23:59 (24:00 is allowed as an endpoint). |
+| end | input | HH:MM | Validate the format. A reversed interval can still be explained as invalid_time. |
+| isAvailable | input | boolean | Must match whether the reason code is available. Supplied by deterministic booking logic. |
+| reasonCode | input | Six-code enum | Reject other codes: invalid_time, past_time, too_long, room_blocked, overlap, available. |
+| explanation | output | Object with explanation string | Validate content, verdict, cited times, two sentences and 280 characters. Rejected output uses the fallback. |
 
 ### 3.3 Acceptance criteria and failure behaviour
 
-F1–F5 (README §3.4), then what the student sees in each failure:
-
-<!-- Write below this line -->
+- F1. Keep existing booking rules and all baseline tests.
+- F2. Explain only the supplied verdict and reason.
+- F3. Reject malformed, blank or overlong input before invoking the adapter.
+- F4. Timeouts and adapter errors use deterministic fallback text.
+- F5. Label the generated explanation separately from the verdict.
 
 | Failure | What the student sees |
 | --- | --- |
-| Invalid input (empty, malformed, too long) | |
-| The model times out | |
-| The model fails (error, no key) | |
-| The model's answer contradicts the decision, or invents a detail | |
+| Invalid input | Explanation unavailable message. The adapter is not called. |
+| Timeout | Reason-code fallback. The original booking verdict stays visible. |
+| Error or missing key | Reason-code fallback. The mock requires no key. |
+| Contradiction or invented details | Reject the generated text and show the fallback. |
 
 ### 3.4 The flow
 
-A written flow with arrows (`->`), or a diagram in a code block. Name your checker function and the
-adapter, and say which one decides availability.
-
 ```text
-(paste here)
+Time form -> parse and validate -> availabilityReason / canBook (decides availability) -> structured input -> explainAvailability -> mockAdapter -> validate explanation or use fallback -> separately labeled text in UI
 ```
-
----
 
 ## 4. Task 3 — build it with an AI assistant
 
